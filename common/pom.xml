@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>toolkits</artifactId>
 		<groupId>me.xethh.libs</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0-RELEASE</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -13,9 +13,10 @@
 	<artifactId>common</artifactId>
 
 	<name>common</name>
-	<version>1.0.SNAPSHOT</version>
+	<version>1.0.RELEASE</version>
 	<!-- FIXME change it to the project's website -->
 	<url>http://www.example.com</url>
+	<description>Library of common used tools - major focus on common tools</description>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
