@@ -6,7 +6,7 @@
 
   <groupId>me.xethh.libs</groupId>
   <artifactId>toolkits</artifactId>
-  <version>1.1-RELEASE</version>
+  <version>1.2-SNAPSHOT</version>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-dependencies</artifactId>
