@@ -104,7 +104,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         }
         ServletResponse newResponse = servletResponse;
         if(cacheResponse && newResponse instanceof HttpServletResponse){
-            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse);
+            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, true);
         }
 
         if(enableAccessLogging && accessLoggingList.size()>0){
