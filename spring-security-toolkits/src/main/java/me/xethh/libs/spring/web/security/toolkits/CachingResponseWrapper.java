@@ -39,7 +39,6 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper {
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return new ServletOutputStream() {
-
             @Override
             public void write(int b) throws IOException {
                 response.getOutputStream().write(b);

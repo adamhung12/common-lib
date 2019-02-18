@@ -107,13 +107,13 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
             newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse);
         }
 
-        if(enableAccessLogging && rawRequestLoggingList.size()>0){
+        if(enableAccessLogging && accessLoggingList.size()>0){
             ServletRequest finalNewRequest = newRequest;
-            rawRequestLoggingList.stream().forEach(x->x.log(getFirstFilterAccessLogger(), finalNewRequest));
+            accessLoggingList.stream().forEach(x->x.log(getFirstFilterAccessLogger(), finalNewRequest));
         }
-        if(enableRawRequestLogging && accessLoggingList.size()>0){
+        if(enableRawRequestLogging && rawRequestLoggingList.size()>0){
             ServletRequest finalNewRequest1 = newRequest;
-            accessLoggingList.stream().forEach(x->x.log(getFirstFilterRawLogger(), finalNewRequest1));
+            rawRequestLoggingList.stream().forEach(x->x.log(getFirstFilterRawLogger(), finalNewRequest1));
         }
 
         filterChain.doFilter(newRequest,newResponse);

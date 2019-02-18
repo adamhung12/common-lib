@@ -1,16 +1,20 @@
 package me.xethh.libs.spring.web.security.toolkits.frontFilter.impl;
 
-import me.xethh.libs.spring.web.security.toolkits.MutableRequest;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType;
+import me.xethh.utils.dateManipulation.DateFactory;
+import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DefaultAccessLogging implements AccessLogging {
+    private SimpleDateFormat format = DateFormatBuilder.ISO8601();
     public interface CustomMessage{
         void message(StringBuilder sb);
     }
@@ -31,7 +35,7 @@ public class DefaultAccessLogging implements AccessLogging {
             sb.append(RawLoggingType.Http.name()).append("||");
         else
             sb.append(RawLoggingType.OtherServelet.name()).append("||");
-        sb.append(System.nanoTime()).append("|");
+        sb.append(format.format(new Date())).append("|").append(System.nanoTime()).append("|");
         sb.append("###");
 
         if(servletRequest != null && servletRequest instanceof HttpServletRequest){
