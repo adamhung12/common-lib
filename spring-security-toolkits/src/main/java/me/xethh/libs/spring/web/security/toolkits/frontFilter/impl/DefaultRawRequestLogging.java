@@ -20,18 +20,18 @@ public class DefaultRawRequestLogging implements RawRequestLogging {
         sb.append(">>>RR_V1>>").append(NewLine);
         sb
             .append("Receive Date: ").append(format.format(new Date())).append("\r\n")
-            .append("Nano time").append(System.nanoTime()).append("\r\n");
+            .append("Nano time: ").append(System.nanoTime()).append("\r\n");
         if(servletRequest!=null && servletRequest instanceof HttpServletRequest){
             printUrlLogger(sb, (HttpServletRequest) servletRequest);
             sb.append("Session Id: " + ((HttpServletRequest) servletRequest).getRequestedSessionId()).append(NewLine);
             if(servletRequest instanceof HttpServletRequest){
-                sb.append(NewLine).append("Request Header:").append(NewLine);
+                sb.append(NewLine).append("Request Header: ").append(NewLine);
                 getHeaderInfo(sb, (HttpServletRequest) servletRequest);
-                sb.append(NewLine).append("Request Params:").append(NewLine);
+                sb.append(NewLine).append("Request Params: ").append(NewLine);
                 getParameters(sb, servletRequest);
             }
             if (servletRequest instanceof CachingRequestWrapper) {
-                sb.append(NewLine).append("Request Body:").append(NewLine);
+                sb.append(NewLine).append("Request Body: ").append(NewLine);
                 sb.append(((CachingRequestWrapper) servletRequest).getCachedStringContent());
             }
         }
@@ -73,12 +73,6 @@ public class DefaultRawRequestLogging implements RawRequestLogging {
             Enumeration<String> headers = req.getHeaders(headerName);
             while (headers.hasMoreElements()) {
                 String headerValue = headers.nextElement();
-                // if(headerName.equalsIgnoreCase("password")){
-                //     for(char x : headerValue.toCharArray())
-                //         sb.append("*");
-                // }
-                // else
-                //     sb.append(headerValue);
                 sb.append(headerValue);
                 if (headers.hasMoreElements()) {
                     sb.append(",");

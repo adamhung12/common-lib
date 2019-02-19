@@ -13,12 +13,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class CachingResponseWrapper extends HttpServletResponseWrapper implements WithLogger {
+    public interface LogOperation{
+        void log(CachingResponseWrapper responseWrapper);
+    }
     HttpServletResponse response;
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    boolean enableLog;
-    String logName;
+
+    LogOperation logOperation;
+
     /**
      * Constructs a response adaptor wrapping the given response.
      *
@@ -26,17 +32,13 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
      * @throws IllegalArgumentException if the response is null
      */
     public CachingResponseWrapper(HttpServletResponse response) {
-        this(response,false);
+        this(response,resp->{});
     }
 
-    public CachingResponseWrapper(HttpServletResponse response, boolean enableLog) {
-        this(response,enableLog,"special-response-log");
-    }
-    public CachingResponseWrapper(HttpServletResponse response, boolean enableLog, String logName) {
+    public CachingResponseWrapper(HttpServletResponse response, LogOperation log) {
         super(response);
         this.response = response;
-        this.enableLog = enableLog;
-        this.logName = logName;
+        this.logOperation = log;
     }
 
     public byte[] getOutputContent(){
@@ -57,20 +59,7 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
-        Log log = enableLog ? () -> {
-            Logger logger = LoggerFactory.getLogger(logName);
-            Collection<String> hs = getHeaderNames();
-            logger.info("Logging response: ");
-            for(String h: hs){
-                logger.info("Header: "+h);
-                for(String s : getHeaders(h)){
-                    logger.info("Value: "+s);
-                }
-            }
-        }
-        : ()->{}
-        ;
-        log.log();
+        CachingResponseWrapper rs = this;
         return new ServletOutputStream() {
             @Override
             public void write(int b) throws IOException {
@@ -87,6 +76,14 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
             public void setWriteListener(WriteListener listener) {
                 throw new UnsupportedOperationException();
             }
+
+            @Override
+            public void flush() throws IOException {
+                super.flush();
+                if(logOperation!=null) logOperation.log(rs);
+            }
+
         };
+
     }
 }

@@ -8,6 +8,7 @@ import me.xethh.utils.dateManipulation.DateFactory;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.GenericFilterBean;
@@ -17,34 +18,54 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class FirstFilter extends GenericFilterBean implements WithLogger {
+    public static String TRANSACTION_HEADER = "CUST-TRANSACTION-ID";
+    public static String TRANSACTION_LEVEL = "TRANSACTION_LEVEL";
+    public interface RequestModifier{
+        void operation(CachingRequestWrapper requestWrapper);
+    }
+    public interface ResponseModifier{
+        void operation(CachingResponseWrapper responseWrapper);
+    }
+
     private Logger logger = logger();
     private Logger firstFilterAccessLogger = LoggerFactory.getLogger("special-access-log");
     private Logger firstFilterRawLogger = LoggerFactory.getLogger("special-request-log");
 
     private List<AccessLogging> accessLoggingList = new ArrayList<>();
     private List<RawRequestLogging> rawRequestLoggingList = new ArrayList<>();
-    private boolean cacheResponse=false;
-    private boolean cacheRequest=false;
-    private boolean enableRoutingMarker=false;
     private boolean enableAccessLogging=true;
     private boolean enableRawRequestLogging =true;
-    private Supplier<String> markerProvider;
-    private Supplier<String> markerHeaderProvider;
+    private CachingResponseWrapper.LogOperation logOperation = response->{};
+    private RequestModifier requestModifier = req->{};
+    private ResponseModifier responseModifier = res->{};
 
-    public void setEnableRoutingMarker(boolean enableRoutingMarker, Supplier<String> markerHeaderProvider, Supplier<String> markerProvider) {
-        this.enableRoutingMarker = enableRoutingMarker;
-        this.markerHeaderProvider = markerHeaderProvider;
-        this.markerProvider = markerProvider;
+    String timestamp = DateFactory.now().format(DateFormatBuilder.Format.NUMBER_DATETIME);
+    AtomicLong longProvider = new AtomicLong(0);
+    private Supplier<String> transactionIdProvider = ()->{
+        return timestamp+"_"+ String.format("%09d", longProvider.incrementAndGet());
+    };
+
+    public void setTransactionIdProvider(Supplier<String> transactionIdProvider) {
+        this.transactionIdProvider = transactionIdProvider;
+    }
+
+    public void setRequestHeader(RequestModifier modifier) {
+        this.requestModifier = modifier;
+    }
+    public void setResponseHeader(ResponseModifier modifier) {
+        this.responseModifier = modifier;
     }
 
     public void setAccessLoggingList(List<AccessLogging> accessLoggingList) {
@@ -55,12 +76,8 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         this.rawRequestLoggingList = rawRequestLoggingList;
     }
 
-    public void setCacheResponse(boolean cacheResponse) {
-        this.cacheResponse = cacheResponse;
-    }
-
-    public void setCacheRequest(boolean cacheRequest) {
-        this.cacheRequest = cacheRequest;
+    public void setResponselogging(CachingResponseWrapper.LogOperation operation){
+        this.logOperation = operation;
     }
 
     public void setEnableAccessLogging(boolean enableAccessLogging) {
@@ -89,22 +106,48 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         return firstFilterRawLogger;
     }
 
+    Pattern numberPattern = Pattern.compile("\\d+");
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         if(logger.isDebugEnabled())
             logger.debug("Start first filter");
+        MDC.clear();
         ServletRequest newRequest = servletRequest;
-        if(enableRoutingMarker && newRequest instanceof HttpServletRequest){
-            newRequest = new MutableHttpRequestWrapper((HttpServletRequest) newRequest);
-        }
-        if(cacheRequest && newRequest instanceof HttpServletRequest){
+
+        Object transactionId = servletRequest.getAttribute(TRANSACTION_HEADER);
+        if(newRequest instanceof HttpServletRequest){
             newRequest = new CachingRequestWrapper((HttpServletRequest) newRequest);
-            ((CachingRequestWrapper) newRequest).putHeader(markerHeaderProvider.get(),markerProvider.get());
+            if(requestModifier !=null)
+                requestModifier.operation((CachingRequestWrapper) newRequest);
+
+            if(transactionId!=null && transactionId instanceof String){
+                ((HttpServletResponse)servletResponse).setHeader(TRANSACTION_HEADER, (String) transactionId);
+                String transactionLevel = ((CachingRequestWrapper) newRequest).getHeader(TRANSACTION_LEVEL);
+                if(transactionId!=null && numberPattern.matcher(transactionLevel).matches()){
+                    ((HttpServletResponse)servletResponse).setHeader(TRANSACTION_LEVEL, String.valueOf(Integer.parseInt(transactionLevel)+1));
+                }
+            }
+            else{
+                if(newRequest!=null && newRequest instanceof HttpServletRequest){
+                    newRequest = new MutableHttpRequestWrapper((HttpServletRequest) newRequest);
+                    ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_HEADER, transactionIdProvider.get());
+                    ((HttpServletResponse)servletResponse).setHeader(TRANSACTION_LEVEL, 0+"");
+                }
+            }
+            MDC.put(TRANSACTION_HEADER,((HttpServletRequest)newRequest).getHeader(TRANSACTION_HEADER));
+            MDC.put(TRANSACTION_LEVEL,((HttpServletRequest)newRequest).getHeader(TRANSACTION_LEVEL));
         }
+
         ServletResponse newResponse = servletResponse;
-        if(cacheResponse && newResponse instanceof HttpServletResponse){
-            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, true);
+        if(newResponse instanceof HttpServletResponse){
+            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, logOperation);
+            if(responseModifier != null)
+                responseModifier.operation((CachingResponseWrapper) newResponse);
+            if(newRequest instanceof HttpServletRequest){
+                newRequest.setAttribute(TRANSACTION_HEADER,((HttpServletRequestWrapper) newRequest).getHeader(TRANSACTION_HEADER));
+                newRequest.setAttribute(TRANSACTION_LEVEL,((HttpServletRequestWrapper) newRequest).getHeader(TRANSACTION_LEVEL));
+            }
         }
 
         if(enableAccessLogging && accessLoggingList.size()>0){
