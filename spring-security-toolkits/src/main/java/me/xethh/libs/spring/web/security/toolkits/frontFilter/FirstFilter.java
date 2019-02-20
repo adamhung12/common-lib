@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +53,11 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     private CachingResponseWrapper.LogOperation logOperation = response->{};
     private RequestModifier requestModifier = req->{};
     private ResponseModifier responseModifier = res->{};
+    private Supplier<String> appInfo = ()-> String.format(ManagementFactory.getRuntimeMXBean().getName());
+
+    public void setAppInfo(Supplier<String> appInfo) {
+        this.appInfo = appInfo;
+    }
 
     String timestamp = DateFactory.now().format(DateFormatBuilder.Format.NUMBER_DATETIME);
     AtomicLong longProvider = new AtomicLong(0);
@@ -113,7 +120,11 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         if(logger.isDebugEnabled())
             logger.debug("Start first filter");
+
         MDC.clear();
+
+        MDC.put("appName",appInfo.get());
+
         ServletRequest newRequest = servletRequest;
 
         if(newRequest instanceof HttpServletRequest){
@@ -142,11 +153,6 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
                 String level = 0 + "";
                 MDC.put(TRANSACTION_HEADER, id);
                 MDC.put(TRANSACTION_LEVEL,level);
-                // if(((HttpServletResponse) servletResponse).containsHeader(TRANSACTION_HEADER))
-                //     ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_HEADER, id);
-                //
-                // if(((HttpServletResponse) servletResponse).containsHeader(TRANSACTION_LEVEL))
-                //     ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_LEVEL, level);
             }
         }
 
