@@ -15,6 +15,7 @@ import java.util.Enumeration;
 import java.util.Map;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_LEVEL;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 public class ZuulPostFilter extends ZuulFilter implements WithLogger {
@@ -47,6 +48,7 @@ public class ZuulPostFilter extends ZuulFilter implements WithLogger {
                 .append(System.nanoTime()).append("|")
                 .append(ctx.getResponseStatusCode()).append("|")
                 .append(res.getHeaders(TRANSACTION_HEADER)).append("|")
+                .append(res.getHeaders(TRANSACTION_LEVEL)).append("|")
                 .append("<<<||")
         ;
         logger.info(sb.toString());

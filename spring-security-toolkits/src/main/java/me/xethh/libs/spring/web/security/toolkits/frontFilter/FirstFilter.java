@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -115,39 +116,48 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         MDC.clear();
         ServletRequest newRequest = servletRequest;
 
-        Object transactionId = servletRequest.getAttribute(TRANSACTION_HEADER);
         if(newRequest instanceof HttpServletRequest){
             newRequest = new CachingRequestWrapper((HttpServletRequest) newRequest);
             if(requestModifier !=null)
                 requestModifier.operation((CachingRequestWrapper) newRequest);
 
-            if(transactionId!=null && transactionId instanceof String){
-                ((HttpServletResponse)servletResponse).setHeader(TRANSACTION_HEADER, (String) transactionId);
-                String transactionLevel = ((CachingRequestWrapper) newRequest).getHeader(TRANSACTION_LEVEL);
-                if(transactionId!=null && numberPattern.matcher(transactionLevel).matches()){
-                    ((HttpServletResponse)servletResponse).setHeader(TRANSACTION_LEVEL, String.valueOf(Integer.parseInt(transactionLevel)+1));
-                }
+            Object transactionId = ((HttpServletRequest)servletRequest).getHeader(TRANSACTION_HEADER);
+            if(transactionId!=null && transactionId instanceof String && !transactionId.equals("")){
+                MDC.put(TRANSACTION_HEADER, (String) transactionId);
+                String transactionLevel = ((HttpServletRequest) servletRequest).getHeader(TRANSACTION_LEVEL);
+                if(transactionLevel!=null && numberPattern.matcher(transactionLevel).matches())
+                    MDC.put(TRANSACTION_LEVEL, String.valueOf(Integer.parseInt(transactionLevel))+1);
+                else
+                    throw new RuntimeException("Missing transaction level");
+
+
+                if(((HttpServletResponse) servletResponse).containsHeader(TRANSACTION_HEADER))
+                    ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_HEADER, (String) transactionId);
+
+                if(((HttpServletResponse) servletResponse).containsHeader(TRANSACTION_LEVEL))
+                    ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_LEVEL, transactionLevel);
             }
             else{
-                if(newRequest!=null && newRequest instanceof HttpServletRequest){
-                    newRequest = new MutableHttpRequestWrapper((HttpServletRequest) newRequest);
-                    ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_HEADER, transactionIdProvider.get());
-                    ((HttpServletResponse)servletResponse).setHeader(TRANSACTION_LEVEL, 0+"");
-                }
+                String id = transactionIdProvider.get();
+                String level = 0 + "";
+                MDC.put(TRANSACTION_HEADER, id);
+                MDC.put(TRANSACTION_LEVEL,level);
+                // if(((HttpServletResponse) servletResponse).containsHeader(TRANSACTION_HEADER))
+                //     ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_HEADER, id);
+                //
+                // if(((HttpServletResponse) servletResponse).containsHeader(TRANSACTION_LEVEL))
+                //     ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_LEVEL, level);
             }
-            MDC.put(TRANSACTION_HEADER,((HttpServletRequest)newRequest).getHeader(TRANSACTION_HEADER));
-            MDC.put(TRANSACTION_LEVEL,((HttpServletRequest)newRequest).getHeader(TRANSACTION_LEVEL));
         }
 
         ServletResponse newResponse = servletResponse;
         if(newResponse instanceof HttpServletResponse){
-            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, logOperation);
+            if(MDC.get(TRANSACTION_LEVEL).equals("0"))
+                newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, logOperation);
+            else
+                newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, logOperation);
             if(responseModifier != null)
                 responseModifier.operation((CachingResponseWrapper) newResponse);
-            if(newRequest instanceof HttpServletRequest){
-                newRequest.setAttribute(TRANSACTION_HEADER,((HttpServletRequestWrapper) newRequest).getHeader(TRANSACTION_HEADER));
-                newRequest.setAttribute(TRANSACTION_LEVEL,((HttpServletRequestWrapper) newRequest).getHeader(TRANSACTION_LEVEL));
-            }
         }
 
         if(enableAccessLogging && accessLoggingList.size()>0){

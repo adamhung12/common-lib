@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
@@ -40,6 +41,7 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
         this.response = response;
         this.logOperation = log;
     }
+
 
     public byte[] getOutputContent(){
         return outputStream.toByteArray();
