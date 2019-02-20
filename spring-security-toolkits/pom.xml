@@ -5,13 +5,12 @@
 	<parent>
 		<artifactId>toolkits</artifactId>
 		<groupId>me.xethh.libs</groupId>
-		<version>1.1-RELEASE</version>
+		<version>1.2-RELEASE</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>me.xethh.libs.toolkits</groupId>
 	<artifactId>spring-web-security</artifactId>
-	<version>1.0-RELEASE</version>
 
 	<name>spring-security-toolkits</name>
 	<!-- FIXME change it to the project's website -->
@@ -58,6 +57,30 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-netflix-zuul</artifactId>
+			<version>2.1.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.netflix.zuul</groupId>
+			<artifactId>zuul-core</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign.form</groupId>
+			<artifactId>feign-form</artifactId>
+            <version>3.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-jackson</artifactId>
+			<version>10.1.0</version>
 		</dependency>
 	</dependencies>
 

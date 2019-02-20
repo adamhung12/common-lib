@@ -6,7 +6,7 @@
 
   <groupId>me.xethh.libs</groupId>
   <artifactId>toolkits</artifactId>
-  <version>1.1-RELEASE</version>
+  <version>1.2-RELEASE</version>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-dependencies</artifactId>
@@ -87,6 +87,11 @@
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>2.6</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>2.9.7</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -174,14 +179,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>
             <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
+            <goals><goal>sign</goal></goals>
+            <configuration>
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
           </execution>
         </executions>
       </plugin>
