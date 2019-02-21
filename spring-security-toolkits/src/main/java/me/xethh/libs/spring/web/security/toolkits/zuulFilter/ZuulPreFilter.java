@@ -3,6 +3,8 @@ package me.xethh.libs.spring.web.security.toolkits.zuulFilter;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawRequestLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
@@ -10,13 +12,37 @@ import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.function.Supplier;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_FORWARD_FILTER_ORDER;
 
 public class ZuulPreFilter extends ZuulFilter implements WithLogger {
+    List<AccessLogging> loggingList  = new ArrayList<>();
+    List<RawRequestLogging> rawRequestLoggings = new ArrayList<>();
+
+    public void setLoggingList(List<AccessLogging> loggingList) {
+        this.loggingList = loggingList;
+    }
+
+    public void setRawRequestLoggings(List<RawRequestLogging> rawRequestLoggings) {
+        this.rawRequestLoggings = rawRequestLoggings;
+    }
+
+    Supplier<Logger> accessLogProvider = ()->logger();
+    Supplier<Logger> rawLogProvider = ()->logger();
+
+    public void setAccessLogProvider(Supplier<Logger> accessLogProvider) {
+        this.accessLogProvider = accessLogProvider;
+    }
+
+    public void setRawLogProvider(Supplier<Logger> rawLogProvider) {
+        this.rawLogProvider = rawLogProvider;
+    }
     @Override
     public String filterType() {
         return PRE_TYPE;
@@ -41,17 +67,20 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
         ctx.addZuulRequestHeader(TRANSACTION_AGENT, MDC.get(TRANSACTION_AGENT));
 
         HttpServletRequest req = ctx.getRequest();
-        Logger logger = logger();
-        StringBuilder sb = new StringBuilder();
-        String NewLine = "\r\n";
-        sb
-                .append(">>>ZR_V1>>")
-                .append(sdf.format(new Date())).append("|")
-                .append(System.nanoTime()).append("|")
-                .append(ctx.getZuulRequestHeaders().get(TRANSACTION_HEADER)).append("|")
-                .append(">>>||")
-        ;
-        logger.info(sb.toString());
+        loggingList.stream().forEach(x->x.log(accessLogProvider.get(),req));
+        rawRequestLoggings.stream().forEach(x->x.log(rawLogProvider.get(),req));
+
+        // Logger logger = logger();
+        // StringBuilder sb = new StringBuilder();
+        // String NewLine = "\r\n";
+        // sb
+        //         .append(">>>ZR_V1>>")
+        //         .append(sdf.format(new Date())).append("|")
+        //         .append(System.nanoTime()).append("|")
+        //         .append(ctx.getZuulRequestHeaders().get(TRANSACTION_HEADER)).append("|")
+        //         .append(">>>||")
+        // ;
+        // logger.info(sb.toString());
         return null;
     }
 }
