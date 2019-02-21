@@ -4,6 +4,7 @@ import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawRequestLogging;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -11,32 +12,39 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
+
 public class DefaultRawRequestLogging implements RawRequestLogging {
     private boolean passwordProtection = true;
     private SimpleDateFormat format = DateFormatBuilder.ISO8601();
+    PerformanceLog performanceLog = PerformanceLog.staticLog;
     @Override
     public void log(Logger logger, ServletRequest servletRequest) {
+        String label = "REQ_RAW_V1";
+        performanceLog.logStart(label,logger);
         StringBuilder sb = new StringBuilder();
-        sb.append(">>>RR_V1>>").append(NewLine);
+        String NewLine = "\r\n";
         sb
-            .append("Receive Date: ").append(format.format(new Date())).append("\r\n")
-            .append("Nano time: ").append(System.nanoTime()).append("\r\n");
+                .append("||").append(label).append("|")
+                .append(MDC.get(TRANSACTION_HEADER)).append("|")
+                .append(format.format(new Date())).append("|")
+                .append(System.nanoTime()).append(NewLine)
+        ;
+
         if(servletRequest!=null && servletRequest instanceof HttpServletRequest){
             printUrlLogger(sb, (HttpServletRequest) servletRequest);
-            sb.append("Session Id: " + ((HttpServletRequest) servletRequest).getRequestedSessionId()).append(NewLine);
-            if(servletRequest instanceof HttpServletRequest){
-                sb.append(NewLine).append("Request Header: ").append(NewLine);
-                getHeaderInfo(sb, (HttpServletRequest) servletRequest);
-                sb.append(NewLine).append("Request Params: ").append(NewLine);
-                getParameters(sb, servletRequest);
-            }
+            sb.append(NewLine).append("Request Header: ").append(NewLine);
+            getHeaderInfo(sb, (HttpServletRequest) servletRequest);
+            sb.append(NewLine).append("Request Params: ").append(NewLine);
+            getParameters(sb, servletRequest);
             if (servletRequest instanceof CachingRequestWrapper) {
                 sb.append(NewLine).append("Request Body: ").append(NewLine);
                 sb.append(((CachingRequestWrapper) servletRequest).getCachedStringContent());
             }
         }
-        sb.append(">>>||").append(NewLine);
+
         logger.info(sb.toString());
+        performanceLog.logEnd(label, logger);
     }
 
 

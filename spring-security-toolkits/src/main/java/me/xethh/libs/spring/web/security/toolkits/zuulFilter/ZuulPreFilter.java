@@ -14,8 +14,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
 
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_LEVEL;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 public class ZuulPreFilter extends ZuulFilter implements WithLogger {
@@ -40,6 +39,7 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
         RequestContext ctx = RequestContext.getCurrentContext();
         ctx.addZuulRequestHeader(TRANSACTION_HEADER, MDC.get(TRANSACTION_HEADER));
         ctx.addZuulRequestHeader(TRANSACTION_LEVEL, MDC.get(TRANSACTION_LEVEL));
+        ctx.addZuulRequestHeader(TRANSACTION_AGENT, MDC.get(TRANSACTION_AGENT));
 
         HttpServletRequest req = ctx.getRequest();
         Logger logger = logger();

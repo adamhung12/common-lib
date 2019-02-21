@@ -2,7 +2,6 @@ package me.xethh.libs.spring.web.security.toolkits.frontFilter;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
-import me.xethh.libs.spring.web.security.toolkits.MutableHttpRequestWrapper;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import me.xethh.utils.dateManipulation.DateFactory;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
@@ -18,13 +17,10 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -33,8 +29,15 @@ import java.util.regex.Pattern;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class FirstFilter extends GenericFilterBean implements WithLogger {
+    public static String APP_NAME = "APP-NAME";
     public static String TRANSACTION_HEADER = "CUST-TRANSACTION-ID";
-    public static String TRANSACTION_LEVEL = "TRANSACTION_LEVEL";
+    public static String TRANSACTION_LEVEL = "CUST-TRANSACTION-LEVEL";
+    public static String TRANSACTION_AGENT = "CUST-TRANSACTION-AGENT";
+
+
+    public static String DEFAULT_LOGGER_ACCESS="special-access-log";
+    public static String DEFAULT_LOGGER_RAW="special-raw-log";
+
     public interface RequestModifier{
         void operation(CachingRequestWrapper requestWrapper);
     }
@@ -43,17 +46,31 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     }
 
     private Logger logger = logger();
-    private Logger firstFilterAccessLogger = LoggerFactory.getLogger("special-access-log");
-    private Logger firstFilterRawLogger = LoggerFactory.getLogger("special-request-log");
+    private Supplier<String> accessLogName = ()->DEFAULT_LOGGER_ACCESS;
+    private Supplier<String> rawLogName = ()->DEFAULT_LOGGER_RAW;
 
     private List<AccessLogging> accessLoggingList = new ArrayList<>();
     private List<RawRequestLogging> rawRequestLoggingList = new ArrayList<>();
     private boolean enableAccessLogging=true;
     private boolean enableRawRequestLogging =true;
-    private CachingResponseWrapper.LogOperation logOperation = response->{};
+    private List<RawResponseLogging> rawResponseLoggings = new ArrayList<>();
+    private List<AccessResponseLogging> accessResponseLoggings = new ArrayList<>();
+    private List<ResponsePreFlushLogging> preFlushLoggings = new ArrayList<>();
     private RequestModifier requestModifier = req->{};
     private ResponseModifier responseModifier = res->{};
     private Supplier<String> appInfo = ()-> String.format(ManagementFactory.getRuntimeMXBean().getName());
+
+    public void setRawResponseLoggings(List<RawResponseLogging> rawResponseLoggings) {
+        this.rawResponseLoggings = rawResponseLoggings;
+    }
+
+    public void setAccessResponseLoggings(List<AccessResponseLogging> accessResponseLoggings) {
+        this.accessResponseLoggings = accessResponseLoggings;
+    }
+
+    public void setPreFlushLoggings(List<ResponsePreFlushLogging> preFlushLoggings) {
+        this.preFlushLoggings = preFlushLoggings;
+    }
 
     public void setAppInfo(Supplier<String> appInfo) {
         this.appInfo = appInfo;
@@ -84,10 +101,6 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         this.rawRequestLoggingList = rawRequestLoggingList;
     }
 
-    public void setResponselogging(CachingResponseWrapper.LogOperation operation){
-        this.logOperation = operation;
-    }
-
     public void setEnableAccessLogging(boolean enableAccessLogging) {
         this.enableAccessLogging = enableAccessLogging;
     }
@@ -96,14 +109,22 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         this.enableRawRequestLogging = enableRawRequestLogging;
     }
 
-    public void setAccessLogName(String accessLogName) {
-        if(accessLogName!=null && !accessLogName.equalsIgnoreCase(""))
-            this.firstFilterAccessLogger = LoggerFactory.getLogger(accessLogName);
+    private Logger firstFilterAccessLogger = LoggerFactory.getLogger(DEFAULT_LOGGER_ACCESS);
+    private Logger firstFilterRawLogger = LoggerFactory.getLogger(DEFAULT_LOGGER_RAW);
+    public void setAccessLogName(Supplier<String> accessLogName) {
+        String name = accessLogName.get();
+        if(name.equals(DEFAULT_LOGGER_ACCESS))
+            return;
+        if(name!=null && !name.equalsIgnoreCase(""))
+            this.firstFilterAccessLogger = LoggerFactory.getLogger(name);
     }
 
-    public void setRawRequestLog(String rawRequestLog) {
-        if(rawRequestLog!=null && !rawRequestLog.equalsIgnoreCase(""))
-            this.firstFilterRawLogger = LoggerFactory.getLogger(rawRequestLog);
+    public void setRawRequestLog(Supplier<String> rawRequestLog) {
+        String name = accessLogName.get();
+        if(name.equals(DEFAULT_LOGGER_RAW))
+            return;
+        if(name!=null && !name.equalsIgnoreCase(""))
+            this.firstFilterRawLogger = LoggerFactory.getLogger(name);
     }
 
     public Logger getFirstFilterAccessLogger() {
@@ -123,7 +144,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
         MDC.clear();
 
-        MDC.put("appName",appInfo.get());
+        MDC.put(APP_NAME,appInfo.get());
 
         ServletRequest newRequest = servletRequest;
 
@@ -137,7 +158,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
                 MDC.put(TRANSACTION_HEADER, (String) transactionId);
                 String transactionLevel = ((HttpServletRequest) servletRequest).getHeader(TRANSACTION_LEVEL);
                 if(transactionLevel!=null && numberPattern.matcher(transactionLevel).matches())
-                    MDC.put(TRANSACTION_LEVEL, String.valueOf(Integer.parseInt(transactionLevel))+1);
+                    MDC.put(TRANSACTION_LEVEL, String.valueOf(Integer.parseInt(transactionLevel)+1));
                 else
                     throw new RuntimeException("Missing transaction level");
 
@@ -154,14 +175,21 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
                 MDC.put(TRANSACTION_HEADER, id);
                 MDC.put(TRANSACTION_LEVEL,level);
             }
+            Object transactionAgent = ((HttpServletRequest)servletRequest).getHeader(TRANSACTION_AGENT);
+            if(transactionAgent!=null && transactionAgent instanceof String && !transactionAgent.equals("")){
+                MDC.put(TRANSACTION_AGENT, (String) transactionAgent);
+            }
+            else {
+                MDC.put(TRANSACTION_AGENT, (String) "Client");
+            }
+
         }
 
         ServletResponse newResponse = servletResponse;
         if(newResponse instanceof HttpServletResponse){
-            if(MDC.get(TRANSACTION_LEVEL).equals("0"))
-                newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, logOperation);
-            else
-                newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, logOperation);
+            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, rawResponseLoggings,accessResponseLoggings,preFlushLoggings);
+            ((CachingResponseWrapper) newResponse).setAccessLoggerProvider(this::getFirstFilterAccessLogger);
+            ((CachingResponseWrapper) newResponse).setRawLoggerProvider(this::getFirstFilterRawLogger);
             if(responseModifier != null)
                 responseModifier.operation((CachingResponseWrapper) newResponse);
         }
