@@ -12,10 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import static feign.Util.decodeOrDefault;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class FeignLogger extends Logger implements WithLogger {
     List<AccessLogging> accessLoggingList = new ArrayList<>();

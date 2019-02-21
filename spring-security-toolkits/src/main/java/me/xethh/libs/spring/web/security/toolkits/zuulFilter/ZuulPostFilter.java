@@ -7,16 +7,14 @@ import me.xethh.libs.toolkits.logging.WithLogger;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Map;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_LEVEL;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_FORWARD_FILTER_ORDER;
 
 public class ZuulPostFilter extends ZuulFilter implements WithLogger {
     @Override

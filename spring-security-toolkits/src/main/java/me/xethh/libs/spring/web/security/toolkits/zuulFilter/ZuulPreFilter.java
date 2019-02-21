@@ -11,11 +11,10 @@ import org.slf4j.MDC;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Map;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.*;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_FORWARD_FILTER_ORDER;
 
 public class ZuulPreFilter extends ZuulFilter implements WithLogger {
     @Override
