@@ -22,6 +22,16 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class ZuulPostFilter extends ZuulFilter implements WithLogger {
     List<AccessResponseLogging> accessResponseLoggingList = new ArrayList<>();
     List<RawResponseLogging> rawResponseLoggings = new ArrayList<>();
+    private boolean enableResponseAccessLog = false;
+    private boolean enableResponseRawLog = false;
+
+    public void setEnableResponseAccessLog(boolean enableResponseAccessLog) {
+        this.enableResponseAccessLog = enableResponseAccessLog;
+    }
+
+    public void setEnableResponseRawLog(boolean enableResponseRawLog) {
+        this.enableResponseRawLog = enableResponseRawLog;
+    }
 
     public void setAccessResponseLoggingList(List<AccessResponseLogging> accessResponseLoggingList) {
         this.accessResponseLoggingList = accessResponseLoggingList;
@@ -63,7 +73,10 @@ public class ZuulPostFilter extends ZuulFilter implements WithLogger {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletResponse res = ctx.getResponse();
         if(!(res instanceof CachingResponseWrapper)){
-            CachingResponseWrapper response = new CachingResponseWrapper(res, rawResponseLoggings, accessResponseLoggingList,accessLogProvider,rawLogProvider);
+            CachingResponseWrapper response = new CachingResponseWrapper(res, rawResponseLoggings
+                    , accessResponseLoggingList,accessLogProvider,rawLogProvider,enableResponseAccessLog
+                    ,enableResponseRawLog
+            );
             ctx.setResponse(response);
         }
         // Logger logger = logger();

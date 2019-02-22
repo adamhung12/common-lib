@@ -41,7 +41,18 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
      * @throws IllegalArgumentException if the response is null
      */
     public CachingResponseWrapper(HttpServletResponse response) {
-        this(response,new ArrayList<>(),new ArrayList<>(),null,null);
+        this(response,new ArrayList<>(),new ArrayList<>(),null,null, false, false);
+    }
+
+    private boolean enableResponseAccessLog = false;
+    private boolean enableResponseRawLog = false;
+
+    public void setEnableResponseAccessLog(boolean enableResponseAccessLog) {
+        this.enableResponseAccessLog = enableResponseAccessLog;
+    }
+
+    public void setEnableResponseRawLog(boolean enableResponseRawLog) {
+        this.enableResponseRawLog = enableResponseRawLog;
     }
 
     public CachingResponseWrapper(
@@ -49,7 +60,9 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
             List<RawResponseLogging> rawResponseLoggings,
             List<AccessResponseLogging> accessResponseLoggings,
             Supplier<Logger> accessLoggerProvider,
-            Supplier<Logger> rawLoggerProvider
+            Supplier<Logger> rawLoggerProvider,
+            boolean enableResponseAccessLog,
+            boolean enableResponseRawLog
     ) {
         super(response);
         this.response = response;
@@ -57,6 +70,8 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
         this.responseLoggings = rawResponseLoggings;
         this.accessLoggerProvider = accessLoggerProvider==null?()->logger():accessLoggerProvider;
         this.rawLoggerProvider = rawLoggerProvider==null?()->logger():rawLoggerProvider;
+        this.enableResponseAccessLog = enableResponseAccessLog;
+        this.enableResponseRawLog = enableResponseRawLog;
     }
 
 
@@ -80,42 +95,51 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
     public void flushBuffer() throws IOException {
         CachingResponseWrapper rs = this;
         super.flushBuffer();
+
         //Serve case when flush with buff of servlet
-        responseLoggings.stream().forEach(x->x.log(rawLoggerProvider.get(),rs));
-        accessResponseLoggings.forEach(x->x.log(accessLoggerProvider.get(),rs));
+        if(enableResponseRawLog && responseLoggings.size()>0)
+            responseLoggings.forEach(x->x.log(rawLoggerProvider.get(),rs));
+        if(enableResponseAccessLog && accessResponseLoggings.size()>0)
+            accessResponseLoggings.stream().forEach(x->x.log(accessLoggerProvider.get(),rs));
     }
+
+    ServletOutputStream _stream;
+    boolean flushed = false;
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         CachingResponseWrapper rs = this;
-        return new ServletOutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                response.getOutputStream().write(b);
-                outputStream.write(b);
-            }
+        if(_stream==null)
+            _stream =  new ServletOutputStream() {
+                @Override
+                public void write(int b) throws IOException {
+                    response.getOutputStream().write(b);
+                    outputStream.write(b);
+                }
 
-            @Override
-            public boolean isReady() {
-                return true;
-            }
+                @Override
+                public boolean isReady() {
+                    return true;
+                }
 
-            @Override
-            public void setWriteListener(WriteListener listener) {
-                throw new UnsupportedOperationException();
-            }
+                @Override
+                public void setWriteListener(WriteListener listener) {
+                    throw new UnsupportedOperationException();
+                }
 
-            @Override
-            public void flush() throws IOException {
-                super.flush();
-                //Serve case when flush with output stream
-                responseLoggings.stream().forEach(x->x.log(rawLoggerProvider.get(),rs));
-                accessResponseLoggings.forEach(x->x.log(accessLoggerProvider.get(),rs));
-            }
-
-
-
-        };
-
+                @Override
+                public void flush() throws IOException {
+                    super.flush();
+                    if(!flushed){
+                        //Serve case when flush with output stream
+                        if(enableResponseRawLog && responseLoggings.size()>0)
+                            responseLoggings.forEach(x->x.log(rawLoggerProvider.get(),rs));
+                        if(enableResponseAccessLog && accessResponseLoggings.size()>0)
+                            accessResponseLoggings.stream().forEach(x->x.log(accessLoggerProvider.get(),rs));
+                        flushed = true;
+                    }
+                }
+            };
+        return _stream;
     }
 }

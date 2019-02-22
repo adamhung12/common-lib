@@ -23,6 +23,28 @@ public class FeignLogger extends Logger implements WithLogger {
     List<AccessResponseLogging> accessResponseLoggings = new ArrayList<>();
     List<RawResponseLogging> rawResponseLoggings = new ArrayList<>();
 
+
+    private boolean enableRequestAccessLog = false;
+    private boolean enableRequestRawLog = false;
+    private boolean enableResponseAccessLog = false;
+    private boolean enableResponseRawLog = false;
+
+    public void setEnableRequestAccessLog(boolean enableRequestAccessLog) {
+        this.enableRequestAccessLog = enableRequestAccessLog;
+    }
+
+    public void setEnableRequestRawLog(boolean enableRequestRawLog) {
+        this.enableRequestRawLog = enableRequestRawLog;
+    }
+
+    public void setEnableResponseAccessLog(boolean enableResponseAccessLog) {
+        this.enableResponseAccessLog = enableResponseAccessLog;
+    }
+
+    public void setEnableResponseRawLog(boolean enableResponseRawLog) {
+        this.enableResponseRawLog = enableResponseRawLog;
+    }
+
     public void setAccessResponseLoggings(List<AccessResponseLogging> accessResponseLoggings) {
         this.accessResponseLoggings = accessResponseLoggings;
     }
@@ -59,8 +81,10 @@ public class FeignLogger extends Logger implements WithLogger {
 
     @Override
     protected void logRequest(String configKey, Level logLevel, Request request) {
-        accessLoggingList.stream().forEach(x->x.log(accessLogLoggerProvider.get(),request));
-        rawRequestLoggingList.stream().forEach(x->x.log(rawLogLoggerProvider.get(),request));
+        if(enableRequestAccessLog && accessLoggingList.size()>0)
+            accessLoggingList.stream().forEach(x->x.log(accessLogLoggerProvider.get(),request));
+        if(enableRequestRawLog && rawRequestLoggingList.size()>0)
+            rawRequestLoggingList.stream().forEach(x->x.log(rawLogLoggerProvider.get(),request));
         // StringBuilder sb = new StringBuilder();
         // sb.append("request to: "+request.url()).append("\r\n");
         // sb.append("request headers: "+"\r\n");
@@ -86,21 +110,34 @@ public class FeignLogger extends Logger implements WithLogger {
         if (response.body() != null && !(status == 204 || status == 205)) {
             // HTTP 204 No Content "...response MUST NOT include a message-body"
             // HTTP 205 Reset Content "...response MUST NOT include an entity"
-            // sb.append("\r\n");
-            byte[] bodyData = Util.toByteArray(response.body().asInputStream());
-            rawResponseLoggings.stream().forEach(x->x.log(rawLogLoggerProvider.get(),response,new String(bodyData, Charsets.UTF_8)));
-            bodyLength = bodyData.length;
-            // if (logLevel.ordinal() >= Level.FULL.ordinal() && bodyLength > 0) {
-            //     sb.append(decodeOrDefault(bodyData,UTF_8,"Binary data")).append("\r\n");
-            // }
-            // logger.info(sb.toString());
-            accessResponseLoggings.stream().forEach(x->x.log(accessLogLoggerProvider.get(),response));
-            return response.toBuilder().body(bodyData).build();
+            if(enableResponseRawLog && rawResponseLoggings.size()>0){
+                byte[] bodyData = Util.toByteArray(response.body().asInputStream());
+                rawResponseLoggings.stream().forEach(x->x.log(rawLogLoggerProvider.get(),response,new String(bodyData, Charsets.UTF_8)));
+
+                if(enableResponseAccessLog && accessResponseLoggings.size()>0)
+                    accessResponseLoggings.stream().forEach(x->x.log(accessLogLoggerProvider.get(),response));
+                return response.toBuilder().body(bodyData).build();
+            }
+            else{
+                if(enableResponseAccessLog && accessResponseLoggings.size()>0)
+                    accessResponseLoggings.stream().forEach(x->x.log(accessLogLoggerProvider.get(),response));
+                return response;
+            }
         } else {
-            accessResponseLoggings.stream().forEach(x->x.log(accessLogLoggerProvider.get(),response));
-            logger.info("Not response body");
+            if(enableResponseRawLog && rawResponseLoggings.size()>0){
+                byte[] bodyData = Util.toByteArray(response.body().asInputStream());
+                rawResponseLoggings.stream().forEach(x->x.log(rawLogLoggerProvider.get(),response,new String(bodyData, Charsets.UTF_8)));
+
+                if(enableResponseAccessLog && accessResponseLoggings.size()>0)
+                    accessResponseLoggings.stream().forEach(x->x.log(accessLogLoggerProvider.get(),response));
+                return response.toBuilder().body(bodyData).build();
+            }
+            else{
+                if(enableResponseAccessLog && accessResponseLoggings.size()>0)
+                    accessResponseLoggings.stream().forEach(x->x.log(accessLogLoggerProvider.get(),response));
+                return response;
+            }
         }
-        return response;
     }
 }
 

@@ -38,6 +38,27 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     public static String DEFAULT_LOGGER_ACCESS="special-access-log";
     public static String DEFAULT_LOGGER_RAW="special-raw-log";
 
+    private boolean enableRequestAccessLog = false;
+    private boolean enableRequestRawLog = false;
+    private boolean enableResponseAccessLog = false;
+    private boolean enableResponseRawLog = false;
+
+    public void setEnableRequestAccessLog(boolean enableRequestAccessLog) {
+        this.enableRequestAccessLog = enableRequestAccessLog;
+    }
+
+    public void setEnableRequestRawLog(boolean enableRequestRawLog) {
+        this.enableRequestRawLog = enableRequestRawLog;
+    }
+
+    public void setEnableResponseAccessLog(boolean enableResponseAccessLog) {
+        this.enableResponseAccessLog = enableResponseAccessLog;
+    }
+
+    public void setEnableResponseRawLog(boolean enableResponseRawLog) {
+        this.enableResponseRawLog = enableResponseRawLog;
+    }
+
     public interface RequestModifier{
         void operation(CachingRequestWrapper requestWrapper);
     }
@@ -51,8 +72,6 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
     private List<AccessLogging> accessLoggingList = new ArrayList<>();
     private List<RawRequestLogging> rawRequestLoggingList = new ArrayList<>();
-    private boolean enableAccessLogging=true;
-    private boolean enableRawRequestLogging =true;
     private List<RawResponseLogging> rawResponseLoggings = new ArrayList<>();
     private List<AccessResponseLogging> accessResponseLoggings = new ArrayList<>();
     private RequestModifier requestModifier = req->{};
@@ -94,14 +113,6 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
     public void setRawRequestLoggingList(List<RawRequestLogging> rawRequestLoggingList) {
         this.rawRequestLoggingList = rawRequestLoggingList;
-    }
-
-    public void setEnableAccessLogging(boolean enableAccessLogging) {
-        this.enableAccessLogging = enableAccessLogging;
-    }
-
-    public void setEnableRawRequestLogging(boolean enableRawRequestLogging) {
-        this.enableRawRequestLogging = enableRawRequestLogging;
     }
 
     private Logger firstFilterAccessLogger = LoggerFactory.getLogger(DEFAULT_LOGGER_ACCESS);
@@ -183,16 +194,18 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         ServletResponse newResponse = servletResponse;
         if(newResponse instanceof HttpServletResponse){
             newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, rawResponseLoggings
-                    ,accessResponseLoggings,this::getFirstFilterAccessLogger,this::getFirstFilterRawLogger);
+                    ,accessResponseLoggings,this::getFirstFilterAccessLogger,this::getFirstFilterRawLogger
+                    ,enableResponseAccessLog,enableResponseRawLog
+            );
             if(responseModifier != null)
                 responseModifier.operation((CachingResponseWrapper) newResponse);
         }
 
-        if(enableAccessLogging && accessLoggingList.size()>0){
+        if(enableRequestAccessLog && accessLoggingList.size()>0){
             ServletRequest finalNewRequest = newRequest;
             accessLoggingList.stream().forEach(x->x.log(getFirstFilterAccessLogger(), finalNewRequest));
         }
-        if(enableRawRequestLogging && rawRequestLoggingList.size()>0){
+        if(enableRequestRawLog && rawRequestLoggingList.size()>0){
             ServletRequest finalNewRequest1 = newRequest;
             rawRequestLoggingList.stream().forEach(x->x.log(getFirstFilterRawLogger(), finalNewRequest1));
         }

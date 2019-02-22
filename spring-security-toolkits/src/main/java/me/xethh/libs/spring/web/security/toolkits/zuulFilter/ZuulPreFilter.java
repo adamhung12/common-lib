@@ -25,6 +25,17 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
     List<AccessLogging> loggingList  = new ArrayList<>();
     List<RawRequestLogging> rawRequestLoggings = new ArrayList<>();
 
+    private boolean enableRequestAccessLog = false;
+    private boolean enableRequestRawLog = false;
+
+    public void setEnableRequestAccessLog(boolean enableRequestAccessLog) {
+        this.enableRequestAccessLog = enableRequestAccessLog;
+    }
+
+    public void setEnableRequestRawLog(boolean enableRequestRawLog) {
+        this.enableRequestRawLog = enableRequestRawLog;
+    }
+
     public void setLoggingList(List<AccessLogging> loggingList) {
         this.loggingList = loggingList;
     }
@@ -67,8 +78,10 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
         ctx.addZuulRequestHeader(TRANSACTION_AGENT, MDC.get(TRANSACTION_AGENT));
 
         HttpServletRequest req = ctx.getRequest();
-        loggingList.stream().forEach(x->x.log(accessLogProvider.get(),req));
-        rawRequestLoggings.stream().forEach(x->x.log(rawLogProvider.get(),req));
+        if(enableRequestAccessLog && loggingList.size()>0)
+            loggingList.stream().forEach(x->x.log(accessLogProvider.get(),req));
+        if(enableRequestRawLog && rawRequestLoggings.size()>0)
+            rawRequestLoggings.stream().forEach(x->x.log(rawLogProvider.get(),req));
 
         // Logger logger = logger();
         // StringBuilder sb = new StringBuilder();
