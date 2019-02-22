@@ -16,6 +16,7 @@
     <module>common</module>
     <module>spring-security-toolkits</module>
     <module>bom</module>
+	  <module>crawler</module>
   </modules>
   <packaging>pom</packaging>
 
