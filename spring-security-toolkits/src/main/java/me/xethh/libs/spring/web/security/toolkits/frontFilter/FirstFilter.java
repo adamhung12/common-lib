@@ -55,7 +55,6 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     private boolean enableRawRequestLogging =true;
     private List<RawResponseLogging> rawResponseLoggings = new ArrayList<>();
     private List<AccessResponseLogging> accessResponseLoggings = new ArrayList<>();
-    private List<ResponsePreFlushLogging> preFlushLoggings = new ArrayList<>();
     private RequestModifier requestModifier = req->{};
     private ResponseModifier responseModifier = res->{};
     private Supplier<String> appInfo = ()-> String.format(ManagementFactory.getRuntimeMXBean().getName());
@@ -66,10 +65,6 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
     public void setAccessResponseLoggings(List<AccessResponseLogging> accessResponseLoggings) {
         this.accessResponseLoggings = accessResponseLoggings;
-    }
-
-    public void setPreFlushLoggings(List<ResponsePreFlushLogging> preFlushLoggings) {
-        this.preFlushLoggings = preFlushLoggings;
     }
 
     public void setAppInfo(Supplier<String> appInfo) {
@@ -187,9 +182,8 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
         ServletResponse newResponse = servletResponse;
         if(newResponse instanceof HttpServletResponse){
-            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, rawResponseLoggings,accessResponseLoggings,preFlushLoggings);
-            ((CachingResponseWrapper) newResponse).setAccessLoggerProvider(this::getFirstFilterAccessLogger);
-            ((CachingResponseWrapper) newResponse).setRawLoggerProvider(this::getFirstFilterRawLogger);
+            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, rawResponseLoggings
+                    ,accessResponseLoggings,this::getFirstFilterAccessLogger,this::getFirstFilterRawLogger);
             if(responseModifier != null)
                 responseModifier.operation((CachingResponseWrapper) newResponse);
         }

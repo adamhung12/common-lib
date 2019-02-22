@@ -1,6 +1,7 @@
-package me.xethh.libs.spring.web.security.toolkits.frontFilter.impl;
+package me.xethh.libs.spring.web.security.toolkits.frontFilter.log.impl;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawResponseLogging;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
@@ -11,10 +12,7 @@ import org.slf4j.MDC;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
@@ -23,9 +21,11 @@ public class DefaultRawResponseLogging implements RawResponseLogging {
     private SimpleDateFormat format = DateFormatBuilder.ISO8601();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
 
+    List<CustomInfoLog> customInfoLogs = new ArrayList<>();
+
     @Override
     public void log(Logger logger, ServletResponse servletResponse) {
-        String label = "RES_RAW_V1";
+        String label = "SPR_RES_RAW_V1";
         performanceLog.logStart(label,logger);
         StringBuilder sb = new StringBuilder();
         String NewLine = "\r\n";
@@ -81,8 +81,6 @@ public class DefaultRawResponseLogging implements RawResponseLogging {
     public interface CustomInfoLog{
         void log(StringBuilder sb, ServletResponse servletResponse);
     }
-
-    List<CustomInfoLog> customInfoLogs = Arrays.asList((sb, servletResponse) -> {});
 
     public void setCustomInfoLogs(List<CustomInfoLog> customInfoLogs) {
         this.customInfoLogs = customInfoLogs;

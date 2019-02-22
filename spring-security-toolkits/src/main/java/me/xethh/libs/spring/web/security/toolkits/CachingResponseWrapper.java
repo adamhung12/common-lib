@@ -2,7 +2,6 @@ package me.xethh.libs.spring.web.security.toolkits;
 
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessResponseLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawResponseLogging;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.ResponsePreFlushLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -27,24 +26,12 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
 
     List<RawResponseLogging> responseLoggings ;
     List<AccessResponseLogging> accessResponseLoggings;
-    List<ResponsePreFlushLogging> preFlushLoggings;
 
     Supplier<Logger> accessLoggerProvider = this::logger;
     Supplier<Logger> rawLoggerProvider = this::logger;
 
-    public void setAccessLoggerProvider(Supplier<Logger> accessLoggerProvider){
-        this.accessLoggerProvider = accessLoggerProvider;
-    }
-    public void setRawLoggerProvider(Supplier<Logger> rawLoggerProvider){
-        this.rawLoggerProvider = rawLoggerProvider;
-    }
-
     public void setAccessResponseLoggings(List<AccessResponseLogging> accessResponseLoggings) {
         this.accessResponseLoggings = accessResponseLoggings;
-    }
-
-    public void setPreFlushLoggings(List<ResponsePreFlushLogging> preFlushLoggings) {
-        this.preFlushLoggings = preFlushLoggings;
     }
 
     /**
@@ -54,20 +41,22 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
      * @throws IllegalArgumentException if the response is null
      */
     public CachingResponseWrapper(HttpServletResponse response) {
-        this(response,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+        this(response,new ArrayList<>(),new ArrayList<>(),null,null);
     }
 
     public CachingResponseWrapper(
             HttpServletResponse response,
             List<RawResponseLogging> rawResponseLoggings,
             List<AccessResponseLogging> accessResponseLoggings,
-            List<ResponsePreFlushLogging> responsePreFlushLoggings
+            Supplier<Logger> accessLoggerProvider,
+            Supplier<Logger> rawLoggerProvider
     ) {
         super(response);
         this.response = response;
         this.accessResponseLoggings = accessResponseLoggings;
-        this.preFlushLoggings = responsePreFlushLoggings;
         this.responseLoggings = rawResponseLoggings;
+        this.accessLoggerProvider = accessLoggerProvider==null?()->logger():accessLoggerProvider;
+        this.rawLoggerProvider = rawLoggerProvider==null?()->logger():rawLoggerProvider;
     }
 
 
@@ -88,9 +77,17 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
     }
 
     @Override
+    public void flushBuffer() throws IOException {
+        CachingResponseWrapper rs = this;
+        super.flushBuffer();
+        //Serve case when flush with buff of servlet
+        responseLoggings.stream().forEach(x->x.log(rawLoggerProvider.get(),rs));
+        accessResponseLoggings.forEach(x->x.log(accessLoggerProvider.get(),rs));
+    }
+
+    @Override
     public ServletOutputStream getOutputStream() throws IOException {
         CachingResponseWrapper rs = this;
-        preFlushLoggings.forEach(x->x.log(accessLoggerProvider.get(),rs));
         return new ServletOutputStream() {
             @Override
             public void write(int b) throws IOException {
@@ -111,9 +108,12 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
             @Override
             public void flush() throws IOException {
                 super.flush();
+                //Serve case when flush with output stream
                 responseLoggings.stream().forEach(x->x.log(rawLoggerProvider.get(),rs));
                 accessResponseLoggings.forEach(x->x.log(accessLoggerProvider.get(),rs));
             }
+
+
 
         };
 

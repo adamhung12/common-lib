@@ -1,7 +1,8 @@
-package me.xethh.libs.spring.web.security.toolkits.frontFilter.impl;
+package me.xethh.libs.spring.web.security.toolkits.zuulFilter.log.Impl;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.ResponsePreFlushLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessResponseLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
@@ -13,7 +14,7 @@ import java.util.List;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 
-public class DefaultPreFlushLogging implements ResponsePreFlushLogging {
+public class DefaultAccessResponseLogging implements AccessResponseLogging {
     private SimpleDateFormat format = DateFormatBuilder.ISO8601();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
     public interface CustomMessage{
@@ -28,7 +29,7 @@ public class DefaultPreFlushLogging implements ResponsePreFlushLogging {
 
     @Override
     public void log(Logger logger, CachingResponseWrapper responseWrapper) {
-        String label = "RES_FLU_V1";
+        String label = "ZUU_RES_ACC_V1";
         performanceLog.logStart(label,logger);
         StringBuilder sb = new StringBuilder();
         sb
@@ -40,10 +41,12 @@ public class DefaultPreFlushLogging implements ResponsePreFlushLogging {
                 .append(System.nanoTime()).append("|")
                 //Separator
                 .append(MDC.get(TRANSACTION_HEADER)).append("|")
+                //Status
+                .append(responseWrapper.getStatus()).append("|")
         ;
         logger.info(sb.toString());
 
         //Log end
-        performanceLog.logEnd(label,logger);
+        performanceLog.logStart(label,logger);
     }
 }

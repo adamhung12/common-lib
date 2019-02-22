@@ -1,14 +1,12 @@
-package me.xethh.libs.spring.web.security.toolkits.feign;
+package me.xethh.libs.spring.web.security.toolkits.feign.log.impl;
 
 import feign.Request;
-import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.impl.PerformanceLog;
+import me.xethh.libs.spring.web.security.toolkits.feign.log.RawRequestLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;

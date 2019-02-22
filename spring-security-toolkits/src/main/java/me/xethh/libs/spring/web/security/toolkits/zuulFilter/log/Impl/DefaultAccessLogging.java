@@ -1,7 +1,8 @@
-package me.xethh.libs.spring.web.security.toolkits.frontFilter.impl;
+package me.xethh.libs.spring.web.security.toolkits.zuulFilter.log.Impl;
 
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
@@ -30,7 +31,7 @@ public class DefaultAccessLogging implements AccessLogging {
 
     @Override
     public void log(Logger logger, ServletRequest servletRequest) {
-        String label = "REQ_ACC_V1";
+        String label = "ZUU_REQ_ACC_V1";
         performanceLog.logStart(label,logger);
         StringBuilder sb = new StringBuilder();
         //Prefix

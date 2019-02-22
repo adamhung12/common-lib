@@ -1,8 +1,8 @@
-package me.xethh.libs.spring.web.security.toolkits.feign;
+package me.xethh.libs.spring.web.security.toolkits.frontFilter.log.impl;
 
-import feign.Response;
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.impl.PerformanceLog;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessResponseLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
@@ -17,8 +17,6 @@ import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter
 public class DefaultAccessResponseLogging implements AccessResponseLogging {
     private SimpleDateFormat format = DateFormatBuilder.ISO8601();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
-
-
     public interface CustomMessage{
         void message(StringBuilder sb);
     }
@@ -30,8 +28,8 @@ public class DefaultAccessResponseLogging implements AccessResponseLogging {
     }
 
     @Override
-    public void log(Logger logger, Response response) {
-        String label = "FEI_RES_ACC_V1";
+    public void log(Logger logger, CachingResponseWrapper responseWrapper) {
+        String label = "SPR_RES_ACC_V1";
         performanceLog.logStart(label,logger);
         StringBuilder sb = new StringBuilder();
         sb
@@ -44,7 +42,7 @@ public class DefaultAccessResponseLogging implements AccessResponseLogging {
                 //Separator
                 .append(MDC.get(TRANSACTION_HEADER)).append("|")
                 //Status
-                .append(response.status()).append("|")
+                .append(responseWrapper.getStatus()).append("|")
         ;
         logger.info(sb.toString());
 

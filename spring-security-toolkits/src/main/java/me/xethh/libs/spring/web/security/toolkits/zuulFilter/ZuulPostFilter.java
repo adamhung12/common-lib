@@ -6,7 +6,6 @@ import com.netflix.zuul.exception.ZuulException;
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessResponseLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawResponseLogging;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.ResponsePreFlushLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class ZuulPostFilter extends ZuulFilter implements WithLogger {
     List<AccessResponseLogging> accessResponseLoggingList = new ArrayList<>();
     List<RawResponseLogging> rawResponseLoggings = new ArrayList<>();
-    List<ResponsePreFlushLogging> responsePreFlushLoggings = new ArrayList<>();
 
     public void setAccessResponseLoggingList(List<AccessResponseLogging> accessResponseLoggingList) {
         this.accessResponseLoggingList = accessResponseLoggingList;
@@ -31,10 +29,6 @@ public class ZuulPostFilter extends ZuulFilter implements WithLogger {
 
     public void setRawResponseLoggings(List<RawResponseLogging> rawResponseLoggings) {
         this.rawResponseLoggings = rawResponseLoggings;
-    }
-
-    public void setResponsePreFlushLoggings(List<ResponsePreFlushLogging> responsePreFlushLoggings) {
-        this.responsePreFlushLoggings = responsePreFlushLoggings;
     }
 
     @Override
@@ -69,7 +63,7 @@ public class ZuulPostFilter extends ZuulFilter implements WithLogger {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletResponse res = ctx.getResponse();
         if(!(res instanceof CachingResponseWrapper)){
-            CachingResponseWrapper response = new CachingResponseWrapper(res, rawResponseLoggings, accessResponseLoggingList, responsePreFlushLoggings);
+            CachingResponseWrapper response = new CachingResponseWrapper(res, rawResponseLoggings, accessResponseLoggingList,accessLogProvider,rawLogProvider);
             ctx.setResponse(response);
         }
         // Logger logger = logger();

@@ -1,8 +1,9 @@
-package me.xethh.libs.spring.web.security.toolkits.feign;
+package me.xethh.libs.spring.web.security.toolkits.feign.log.impl;
 
 import feign.Request;
+import me.xethh.libs.spring.web.security.toolkits.feign.log.AccessLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.impl.PerformanceLog;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.MDC;

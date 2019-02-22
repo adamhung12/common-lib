@@ -1,4 +1,4 @@
-package me.xethh.libs.spring.web.security.toolkits.frontFilter.impl;
+package me.xethh.libs.spring.web.security.toolkits.frontFilter;
 
 import org.slf4j.Logger;
 
