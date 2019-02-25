@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 public class PreTokenFilter extends OncePerRequestFilter {
@@ -40,7 +41,7 @@ public class PreTokenFilter extends OncePerRequestFilter {
                 return;
             }
             if(tokenValue.getV1()!=null && tokenValue.getV2()!=null && DateFactory.now().beforeEqual(tokenValue.getV2())){
-                SecurityContextHolder.getContext().setAuthentication(new ApiTokenAuthenticate(tokenValue.getV1(),token,new ArrayList<>()));
+                SecurityContextHolder.getContext().setAuthentication(new ApiTokenAuthenticate(tokenValue.getV1(),token, Arrays.asList(ApiTokenAuthenticate.ApiTokenAuthority.of("api_user"))));
             }
             else{
                 advice.setException(httpServletResponse, new GeneralExceptionModelImpl.TokenNotValid());

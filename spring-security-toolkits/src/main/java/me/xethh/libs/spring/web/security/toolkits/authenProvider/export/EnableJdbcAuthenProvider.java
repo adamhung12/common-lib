@@ -1,0 +1,42 @@
+package me.xethh.libs.spring.web.security.toolkits.authenProvider.export;
+
+import me.xethh.libs.spring.web.security.toolkits.authenProvider.JdbcAuthenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
+import org.springframework.session.jdbc.JdbcOperationsSessionRepository;
+
+import javax.sql.DataSource;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Import(EnableJdbcAuthenProvider.Config.class)
+public @interface EnableJdbcAuthenProvider {
+    public static class Config{
+
+        @Bean
+        public FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository(
+                @Autowired @Qualifier("me_xethh_utils_authen_default_jdbc_datasource") DataSource dataSource,
+                @Value("${me.xethh.utils.authen.default.jdbc.session.defaultMaxInactiveInterval}") int inactiveInterval
+        ){
+            JdbcOperationsSessionRepository repo = new JdbcOperationsSessionRepository(new JdbcTemplate(dataSource));
+            repo.setDefaultMaxInactiveInterval(inactiveInterval);
+            return repo;
+        }
+
+        @Bean
+        public JdbcAuthenProvider jdbcAuthenProvider(){
+            return new JdbcAuthenProvider();
+        }
+    }
+}
