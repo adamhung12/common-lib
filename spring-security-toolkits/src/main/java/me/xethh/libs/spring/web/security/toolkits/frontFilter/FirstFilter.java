@@ -33,6 +33,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     public static String TRANSACTION_HEADER = "CUST-TRANSACTION-ID";
     public static String TRANSACTION_LEVEL = "CUST-TRANSACTION-LEVEL";
     public static String TRANSACTION_AGENT = "CUST-TRANSACTION-AGENT";
+    public static String TRANSACTION_SESSION_ID = "CUST-TRANSACTION-SESSION-ID";
 
 
     public static String DEFAULT_LOGGER_ACCESS="special-access-log";
@@ -187,6 +188,13 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
             }
             else {
                 MDC.put(TRANSACTION_AGENT, (String) "Client");
+            }
+            Object transactionSession = ((HttpServletRequest)servletRequest).getHeader(TRANSACTION_SESSION_ID);
+            if(transactionSession!=null && transactionSession instanceof String && !transactionSession.equals("")){
+                MDC.put(TRANSACTION_SESSION_ID, (String) transactionSession);
+            }
+            else {
+                MDC.put(TRANSACTION_SESSION_ID, (String) "");
             }
 
         }

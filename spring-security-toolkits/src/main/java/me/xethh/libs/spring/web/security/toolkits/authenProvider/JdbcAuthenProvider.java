@@ -71,20 +71,13 @@ public class JdbcAuthenProvider
     FindByIndexNameSessionRepository findByIndexNameSessionRepository;
 
     public String newToken(String username){
-        UUID uuid;
         int trail = 10;
-        while((uuid=UUID.randomUUID()) !=null && trail>0){
-            String token = uuid.toString().replace("-","");
-            String newToken = username+"_"+token;
-
-            Map session = findByIndexNameSessionRepository.findByPrincipalName(newToken);
-            if(session.size()==0){
-                Session newSession = findByIndexNameSessionRepository.createSession();
-                newSession.setAttribute(PRINCIPAL_NAME_INDEX_NAME,token);
-                newSession.setAttribute("clientId",username);
-                newSession.setAttribute("sessionId",newSession.getId());
+        while(trail>0){
+            Session newSession = findByIndexNameSessionRepository.createSession();
+            if(newSession!=null && findByIndexNameSessionRepository.findById(newSession.getId())==null){
+                newSession.setAttribute(PRINCIPAL_NAME_INDEX_NAME,username);
                 findByIndexNameSessionRepository.save(newSession);
-                return token;
+                return newSession.getId();
             }
             else {
                 trail--;
@@ -102,7 +95,7 @@ public class JdbcAuthenProvider
         PureAuthUser user = new PureAuthUser(name, password);
         if(authenticator.isValid(user)){
             String token = newToken(name);
-            return new JdbcAuthentication(name, token, Arrays.asList(JdbcAuthority.of("login_only")));
+            return new JdbcAuthentication(name, token, Arrays.asList(JdbcAuthority.of("ROLE_login_only")));
         }
         else{
             logger().error("Fail login, unexpected return type");

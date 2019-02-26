@@ -3,6 +3,7 @@ package me.xethh.libs.spring.web.security.toolkits.zuulFilter;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawRequestLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
@@ -13,6 +14,7 @@ import org.slf4j.MDC;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
@@ -75,13 +77,20 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
         RequestContext ctx = RequestContext.getCurrentContext();
         ctx.addZuulRequestHeader(TRANSACTION_HEADER, MDC.get(TRANSACTION_HEADER));
         ctx.addZuulRequestHeader(TRANSACTION_LEVEL, MDC.get(TRANSACTION_LEVEL));
-        ctx.addZuulRequestHeader(TRANSACTION_AGENT, MDC.get(TRANSACTION_AGENT));
+        ctx.addZuulRequestHeader(TRANSACTION_AGENT, "ZUUL");
+        ctx.addZuulRequestHeader(TRANSACTION_SESSION_ID, MDC.get(TRANSACTION_SESSION_ID));
 
         HttpServletRequest req = ctx.getRequest();
         if(enableRequestAccessLog && loggingList.size()>0)
             loggingList.stream().forEach(x->x.log(accessLogProvider.get(),req));
         if(enableRequestRawLog && rawRequestLoggings.size()>0)
             rawRequestLoggings.stream().forEach(x->x.log(rawLogProvider.get(),req));
+
+        if(req instanceof CachingRequestWrapper){
+            logger().info("Replacing the authentication");
+            req.removeAttribute("Authorization");
+            req.setAttribute("Authorization", Base64.getEncoder().encodeToString("CITIC_CPAAS_API:SAAPC_CITIC_@#21".getBytes()));
+        }
 
         // Logger logger = logger();
         // StringBuilder sb = new StringBuilder();

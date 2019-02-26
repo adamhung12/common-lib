@@ -1,12 +1,10 @@
 package me.xethh.libs.spring.web.security.toolkits.authenProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.xethh.libs.spring.web.security.toolkits.authenProvider.entity.AuthenOperation;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,12 +13,14 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
+
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_SESSION_ID;
 
 public class JdbcAuthenSuccessHandler extends SimpleUrlAuthenticationSuccessHandler implements WithLogger {
 
@@ -36,13 +36,9 @@ public class JdbcAuthenSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         Authentication authen = context.getAuthentication();
 
         if(authen!=null && authen instanceof JdbcAuthenProvider.JdbcAuthentication && authen.isAuthenticated()){
-            Map session = findByIndexNameSessionRepository.findByPrincipalName((String) authen.getCredentials());
-            MDC.put("clientId", (String) session.get("clientId"));
+            Session session = findByIndexNameSessionRepository.findById((String) authen.getCredentials());
+            MDC.put(TRANSACTION_SESSION_ID,session.getId());
 
-            String user = authen.getName();
-            logger().info(String.format("Start generating token for user[%s]", user));
-            AuthenOperation.AuthenRequest authenRequest = new AuthenOperation.AuthenRequest();
-            // StaticService1.tokenFactory.saveTokenValue((String) authen.getCredentials(), Tuple2.of(user, DateFactory.now().addMins(10).asDate()));
             ObjectMapper mapper = new ObjectMapper();
             response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
             response.getOutputStream().write(mapper.writeValueAsBytes(new TokenResponse((String) authen.getCredentials())));
