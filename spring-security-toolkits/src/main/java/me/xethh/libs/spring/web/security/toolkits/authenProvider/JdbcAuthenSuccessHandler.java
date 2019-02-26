@@ -5,6 +5,8 @@ import me.xethh.libs.spring.web.security.toolkits.authenProvider.entity.AuthenOp
 import me.xethh.libs.toolkits.logging.WithLogger;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,6 +44,7 @@ public class JdbcAuthenSuccessHandler extends SimpleUrlAuthenticationSuccessHand
             AuthenOperation.AuthenRequest authenRequest = new AuthenOperation.AuthenRequest();
             // StaticService1.tokenFactory.saveTokenValue((String) authen.getCredentials(), Tuple2.of(user, DateFactory.now().addMins(10).asDate()));
             ObjectMapper mapper = new ObjectMapper();
+            response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
             response.getOutputStream().write(mapper.writeValueAsBytes(new TokenResponse((String) authen.getCredentials())));
             response.flushBuffer();
             clearAuthenticationAttributes(request);
