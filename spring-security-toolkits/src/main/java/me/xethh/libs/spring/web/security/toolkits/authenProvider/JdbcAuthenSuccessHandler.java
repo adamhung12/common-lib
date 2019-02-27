@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_CLIENT_ID;
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_SESSION_ID;
 
 public class JdbcAuthenSuccessHandler extends SimpleUrlAuthenticationSuccessHandler implements WithLogger {
@@ -37,7 +38,11 @@ public class JdbcAuthenSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
         if(authen!=null && authen instanceof JdbcAuthenProvider.JdbcAuthentication && authen.isAuthenticated()){
             Session session = findByIndexNameSessionRepository.findById((String) authen.getCredentials());
+            session.setAttribute(TRANSACTION_CLIENT_ID, authen.getName());
+            findByIndexNameSessionRepository.save(session);
             MDC.put(TRANSACTION_SESSION_ID,session.getId());
+            MDC.put(TRANSACTION_CLIENT_ID,authen.getName());
+
 
             ObjectMapper mapper = new ObjectMapper();
             response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
 
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_CLIENT_ID;
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_SESSION_ID;
 import static org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME;
 
@@ -48,6 +49,7 @@ public class PreTokenFilter extends OncePerRequestFilter {
             findByIndexNameSessionRepository.save(session);
             if(!session.isExpired()){
                 SecurityContextHolder.getContext().setAuthentication(new ApiTokenAuthenticate(session.getAttribute(PRINCIPAL_NAME_INDEX_NAME),token, Arrays.asList(ApiTokenAuthenticate.ApiTokenAuthority.of("ROLE_api_user"))));
+                MDC.put(TRANSACTION_CLIENT_ID, session.getAttribute(TRANSACTION_CLIENT_ID));
                 MDC.put(TRANSACTION_SESSION_ID,token);
             }
             else{

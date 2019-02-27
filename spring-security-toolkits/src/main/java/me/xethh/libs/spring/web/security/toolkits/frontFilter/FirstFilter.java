@@ -34,6 +34,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     public static String TRANSACTION_LEVEL = "CUST-TRANSACTION-LEVEL";
     public static String TRANSACTION_AGENT = "CUST-TRANSACTION-AGENT";
     public static String TRANSACTION_SESSION_ID = "CUST-TRANSACTION-SESSION-ID";
+    public static String TRANSACTION_CLIENT_ID = "CUST-CLIENT-ID";
 
 
     public static String DEFAULT_LOGGER_ACCESS="special-access-log";
