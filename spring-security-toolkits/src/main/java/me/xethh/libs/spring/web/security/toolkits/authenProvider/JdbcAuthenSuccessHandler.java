@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_CLIENT_ID;
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_SESSION_ID;
+import static org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME;
 
 public class JdbcAuthenSuccessHandler extends SimpleUrlAuthenticationSuccessHandler implements WithLogger {
 

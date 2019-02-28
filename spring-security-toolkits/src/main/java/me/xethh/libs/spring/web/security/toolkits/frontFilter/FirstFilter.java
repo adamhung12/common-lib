@@ -8,8 +8,11 @@ import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -21,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -35,7 +39,10 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     public static String TRANSACTION_AGENT = "CUST-TRANSACTION-AGENT";
     public static String TRANSACTION_SESSION_ID = "CUST-TRANSACTION-SESSION-ID";
     public static String TRANSACTION_CLIENT_ID = "CUST-CLIENT-ID";
-
+    public static List<String> TRANSFERRING_MESSAGES = Arrays.asList(
+            APP_NAME,TRANSACTION_HEADER,TRANSACTION_LEVEL,
+            TRANSACTION_AGENT,TRANSACTION_SESSION_ID
+    );
 
     public static String DEFAULT_LOGGER_ACCESS="special-access-log";
     public static String DEFAULT_LOGGER_RAW="special-raw-log";

@@ -13,10 +13,7 @@ import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.*;
@@ -24,7 +21,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_FORWARD_FILTER_ORDER;
 
 public class ZuulPreFilter extends ZuulFilter implements WithLogger {
-    List<AccessLogging> loggingList  = new ArrayList<>();
+    List<AccessLogging> loggingList = new ArrayList<>();
     List<RawRequestLogging> rawRequestLoggings = new ArrayList<>();
 
     private boolean enableRequestAccessLog = false;
@@ -46,8 +43,8 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
         this.rawRequestLoggings = rawRequestLoggings;
     }
 
-    Supplier<Logger> accessLogProvider = ()->logger();
-    Supplier<Logger> rawLogProvider = ()->logger();
+    Supplier<Logger> accessLogProvider = () -> logger();
+    Supplier<Logger> rawLogProvider = () -> logger();
 
     public void setAccessLogProvider(Supplier<Logger> accessLogProvider) {
         this.accessLogProvider = accessLogProvider;
@@ -56,6 +53,7 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
     public void setRawLogProvider(Supplier<Logger> rawLogProvider) {
         this.rawLogProvider = rawLogProvider;
     }
+
     @Override
     public String filterType() {
         return PRE_TYPE;
@@ -63,7 +61,7 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
 
     @Override
     public int filterOrder() {
-        return SEND_FORWARD_FILTER_ORDER-1;
+        return SEND_FORWARD_FILTER_ORDER - 1;
     }
 
     @Override
@@ -72,21 +70,28 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
     }
 
     SimpleDateFormat sdf = DateFormatBuilder.ISO8601();
+
     @Override
     public Object run() throws ZuulException {
         RequestContext ctx = RequestContext.getCurrentContext();
-        ctx.addZuulRequestHeader(TRANSACTION_HEADER, MDC.get(TRANSACTION_HEADER));
-        ctx.addZuulRequestHeader(TRANSACTION_LEVEL, MDC.get(TRANSACTION_LEVEL));
-        ctx.addZuulRequestHeader(TRANSACTION_AGENT, "ZUUL");
-        ctx.addZuulRequestHeader(TRANSACTION_SESSION_ID, MDC.get(TRANSACTION_SESSION_ID));
+        for (Map.Entry<String, String> keySet : MDC.getCopyOfContextMap().entrySet()) {
+            if (TRANSFERRING_MESSAGES.contains(keySet.getKey())) {
+                ctx.addZuulRequestHeader(keySet.getKey(), keySet.getValue());
+            }
+
+        }
+        // ctx.addZuulRequestHeader(TRANSACTION_HEADER, MDC.get(TRANSACTION_HEADER));
+        // ctx.addZuulRequestHeader(TRANSACTION_LEVEL, MDC.get(TRANSACTION_LEVEL));
+        // ctx.addZuulRequestHeader(TRANSACTION_AGENT, "ZUUL");
+        // ctx.addZuulRequestHeader(TRANSACTION_SESSION_ID, MDC.get(TRANSACTION_SESSION_ID));
 
         HttpServletRequest req = ctx.getRequest();
-        if(enableRequestAccessLog && loggingList.size()>0)
-            loggingList.stream().forEach(x->x.log(accessLogProvider.get(),req));
-        if(enableRequestRawLog && rawRequestLoggings.size()>0)
-            rawRequestLoggings.stream().forEach(x->x.log(rawLogProvider.get(),req));
+        if (enableRequestAccessLog && loggingList.size() > 0)
+            loggingList.stream().forEach(x -> x.log(accessLogProvider.get(), req));
+        if (enableRequestRawLog && rawRequestLoggings.size() > 0)
+            rawRequestLoggings.stream().forEach(x -> x.log(rawLogProvider.get(), req));
 
-        if(req instanceof CachingRequestWrapper){
+        if (req instanceof CachingRequestWrapper) {
             logger().info("Replacing the authentication");
             req.removeAttribute("Authorization");
             req.setAttribute("Authorization", Base64.getEncoder().encodeToString("CITIC_CPAAS_API:SAAPC_CITIC_@#21".getBytes()));

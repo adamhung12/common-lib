@@ -45,12 +45,19 @@ public class PreTokenFilter extends OncePerRequestFilter {
                 advice.setException(httpServletResponse, new GeneralExceptionModelImpl.TokenNotValid());
                 return;
             }
-            session.setLastAccessedTime(Instant.now());
-            findByIndexNameSessionRepository.save(session);
             if(!session.isExpired()){
-                SecurityContextHolder.getContext().setAuthentication(new ApiTokenAuthenticate(session.getAttribute(PRINCIPAL_NAME_INDEX_NAME),token, Arrays.asList(ApiTokenAuthenticate.ApiTokenAuthority.of("ROLE_api_user"))));
+                session.setLastAccessedTime(Instant.now());
+                findByIndexNameSessionRepository.save(session);
+                SecurityContextHolder.getContext()
+                        .setAuthentication(
+                                new ApiTokenAuthenticate(
+                                        session.getAttribute(PRINCIPAL_NAME_INDEX_NAME),
+                                        token,
+                                        Arrays.asList(ApiTokenAuthenticate.ApiTokenAuthority.of("ROLE_api_user"))
+                                )
+                        );
+                MDC.put(TRANSACTION_SESSION_ID, session.getId());
                 MDC.put(TRANSACTION_CLIENT_ID, session.getAttribute(TRANSACTION_CLIENT_ID));
-                MDC.put(TRANSACTION_SESSION_ID,token);
             }
             else{
                 advice.setException(httpServletResponse, new GeneralExceptionModelImpl.TokenNotValid());
