@@ -2,17 +2,17 @@ package me.xethh.libs.spring.web.security.toolkits.frontFilter;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProperties.FirstFilterProperties;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import me.xethh.utils.dateManipulation.DateFactory;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.session.FindByIndexNameSessionRepository;
-import org.springframework.session.Session;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -44,8 +44,10 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
             TRANSACTION_AGENT,TRANSACTION_SESSION_ID
     );
 
-    public static String DEFAULT_LOGGER_ACCESS="special-access-log";
-    public static String DEFAULT_LOGGER_RAW="special-raw-log";
+    @Value("${first-filter.accessLogName}")
+    public String DEFAULT_LOGGER_ACCESS="special-access-log";
+    @Value("${first-filter.rawLogName}")
+    public String DEFAULT_LOGGER_RAW="special-raw-log";
 
     private boolean enableRequestAccessLog = false;
     private boolean enableRequestRawLog = false;
