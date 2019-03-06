@@ -17,7 +17,7 @@ import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter
 
 public class DefaultRawRequestLogging implements RawRequestLogging {
     private boolean passwordProtection = true;
-    private SimpleDateFormat format = DateFormatBuilder.ISO8601();
+    private SimpleDateFormat format = DateFormatBuilder.Format.ISO8601.getFormatter();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
     @Override
     public void log(Logger logger, ServletRequest servletRequest) {

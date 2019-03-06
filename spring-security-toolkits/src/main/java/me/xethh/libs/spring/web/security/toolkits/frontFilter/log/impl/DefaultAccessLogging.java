@@ -17,7 +17,7 @@ import java.util.List;
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 
 public class DefaultAccessLogging implements AccessLogging {
-    private SimpleDateFormat format = DateFormatBuilder.ISO8601();
+    private SimpleDateFormat format = DateFormatBuilder.Format.ISO8601.getFormatter();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
     public interface CustomMessage{
         void message(StringBuilder sb);

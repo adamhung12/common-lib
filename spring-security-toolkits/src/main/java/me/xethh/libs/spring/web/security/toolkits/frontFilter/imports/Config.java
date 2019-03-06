@@ -1,13 +1,18 @@
 package me.xethh.libs.spring.web.security.toolkits.frontFilter.imports;
 
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.*;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.AppNameProvider;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.DefaultAppNameProvider;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.NoneAppNameProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProperties.FirstFilterProperties;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.log.impl.DefaultAccessLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.log.impl.DefaultAccessResponseLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.log.impl.DefaultRawRequestLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.log.impl.DefaultRawResponseLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.transactionIdProvider.IdProvider;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.transactionIdProvider.MachineBasedProvider;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.transactionIdProvider.TimeBasedProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -35,20 +40,41 @@ public class Config {
         return new DefaultRawResponseLogging();
     }
 
-    @Value("${first-filter.app-name}")
-    private String appName;
+    @Autowired FirstFilterProperties firstFilterProperties;
 
     @Bean
-    public FirstFilterProperties firstFilterProperties(){
-        return new FirstFilterProperties();
+    public AppNameProvider appNameProvider(){
+        switch (firstFilterProperties.getAppNameProvider().getType()){
+            case Default:
+                return new DefaultAppNameProvider();
+            case None:
+                return new NoneAppNameProvider();
+            case Custom:
+                throw new RuntimeException("app name provider not supported");
+        }
+        throw new RuntimeException("Fail to app name provider");
+    }
+
+    @Bean
+    public IdProvider idBuilder(){
+        switch (firstFilterProperties.getTransactionId().getType()){
+            case Time_Base:
+                return new TimeBasedProvider();
+            case Machine_Time_Based:
+                MachineBasedProvider mb = new MachineBasedProvider();
+                mb.setServiceId(firstFilterProperties.getServiceId());
+                return mb;
+            case Custom:
+                throw new RuntimeException("Custom id provider not supported");
+        }
+        throw new RuntimeException("Fail to create id provider");
     }
     @Bean
     public FirstFilter firstFilter(
             @Autowired List<AccessLogging> accessLoggingList,
             @Autowired List<RawRequestLogging> rawRequestLoggingList,
             @Autowired List<RawResponseLogging> rawResponseLoggings,
-            @Autowired List<AccessResponseLogging> accessResponseLoggings,
-            @Autowired FirstFilterProperties firstFilterProperties
+            @Autowired List<AccessResponseLogging> accessResponseLoggings
 
             // @Value("${log.access.logName}") String accessLogName,
             // @Value("${log.request.logName}") String requestLogName
@@ -64,7 +90,6 @@ public class Config {
         filter.setEnableRequestRawLog(false);
         filter.setEnableResponseAccessLog(true);
         filter.setEnableResponseRawLog(false);
-        filter.setAppInfo(()-> ManagementFactory.getRuntimeMXBean().getName()+":"+appName);
         return filter;
     }
 }

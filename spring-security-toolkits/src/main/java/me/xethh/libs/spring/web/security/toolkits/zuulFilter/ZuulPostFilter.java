@@ -67,7 +67,7 @@ public class ZuulPostFilter extends ZuulFilter implements WithLogger {
         this.rawLogProvider = rawLogProvider;
     }
 
-    SimpleDateFormat sdf = DateFormatBuilder.ISO8601();
+    SimpleDateFormat sdf = DateFormatBuilder.Format.ISO8601.getFormatter();
     @Override
     public Object run() throws ZuulException {
         RequestContext ctx = RequestContext.getCurrentContext();

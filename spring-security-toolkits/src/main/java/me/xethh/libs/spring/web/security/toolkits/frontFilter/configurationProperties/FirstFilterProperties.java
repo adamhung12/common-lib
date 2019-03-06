@@ -3,10 +3,53 @@ package me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProp
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 
-@ConfigurationProperties(prefix = "first-filter", ignoreInvalidFields = false)
+@ConfigurationProperties(prefix = "first-filter", ignoreInvalidFields = true)
 public class FirstFilterProperties {
-    private String appName;
 
+    private String serviceId;
+    private Editing edit;
+    private Log logging;
+    private TransactionIdConfig transactionId;
+    private AppNameConfig appNameProvider;
+
+    public static class AppNameConfig{
+       public enum BuildType{
+           Default, None, Custom
+       }
+
+       private BuildType type;
+
+        public BuildType getType() {
+            return type;
+        }
+
+        public void setType(BuildType type) {
+            this.type = type;
+        }
+    }
+    public static class TransactionIdConfig{
+        public enum BuildType{
+            Time_Base, Machine_Time_Based, Custom
+        }
+        private String staticName;
+        private BuildType type;
+
+        public BuildType getType() {
+            return type;
+        }
+
+        public void setType(BuildType type) {
+            this.type = type;
+        }
+
+        public String getStaticName() {
+            return staticName;
+        }
+
+        public void setStaticName(String staticName) {
+            this.staticName = staticName;
+        }
+    }
     public static class Editing{
         private boolean enabled;
 
@@ -39,9 +82,13 @@ public class FirstFilterProperties {
         }
     }
 
+    public TransactionIdConfig getTransactionId() {
+        return transactionId;
+    }
 
-    private Editing edit;
-    private Log logging;
+    public void setTransactionId(TransactionIdConfig transactionId) {
+        this.transactionId = transactionId;
+    }
 
     public Editing getEdit() {
         return edit;
@@ -59,11 +106,19 @@ public class FirstFilterProperties {
         this.logging = logging;
     }
 
-    public String getAppName() {
-        return appName;
+    public String getServiceId() {
+        return serviceId;
     }
 
-    public void setAppName(String appName) {
-        this.appName = appName;
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public AppNameConfig getAppNameProvider() {
+        return appNameProvider;
+    }
+
+    public void setAppNameProvider(AppNameConfig appNameProvider) {
+        this.appNameProvider = appNameProvider;
     }
 }

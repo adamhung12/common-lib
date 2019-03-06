@@ -16,7 +16,7 @@ import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType.FeignRes;
 
 public class DefaultRawResponseLogging implements RawResponseLogging {
-    private SimpleDateFormat format = DateFormatBuilder.ISO8601();
+    private SimpleDateFormat format = DateFormatBuilder.Format.ISO8601.getFormatter();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
 
     @Override
@@ -70,5 +70,5 @@ public class DefaultRawResponseLogging implements RawResponseLogging {
         return LoggerFactory.getLogger("special-response-log");
     }
 
-    SimpleDateFormat sdf = DateFormatBuilder.ISO8601();
+    SimpleDateFormat sdf = DateFormatBuilder.Format.ISO8601.getFormatter();
 }

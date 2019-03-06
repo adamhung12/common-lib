@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 
 public class DefaultRawResponseLogging implements RawResponseLogging {
-    private SimpleDateFormat format = DateFormatBuilder.ISO8601();
+    private SimpleDateFormat format = DateFormatBuilder.Format.ISO8601.getFormatter();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
 
     List<CustomInfoLog> customInfoLogs = new ArrayList<>();
@@ -90,5 +90,5 @@ public class DefaultRawResponseLogging implements RawResponseLogging {
         return LoggerFactory.getLogger("special-response-log");
     }
 
-    SimpleDateFormat sdf = DateFormatBuilder.ISO8601();
+    SimpleDateFormat sdf = DateFormatBuilder.Format.ISO8601.getFormatter();
 }

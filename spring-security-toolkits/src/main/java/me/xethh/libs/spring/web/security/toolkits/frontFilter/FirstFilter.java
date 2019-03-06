@@ -2,19 +2,21 @@ package me.xethh.libs.spring.web.security.toolkits.frontFilter;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.AppNameProvider;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.NoneAppNameProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProperties.FirstFilterProperties;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.transactionIdProvider.IdProvider;
 import me.xethh.libs.toolkits.logging.WithLogger;
-import me.xethh.utils.dateManipulation.DateFactory;
-import me.xethh.utils.dateManipulation.DateFormatBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.GenericFilterBean;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -26,7 +28,6 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -44,10 +45,33 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
             TRANSACTION_AGENT,TRANSACTION_SESSION_ID
     );
 
-    @Value("${first-filter.accessLogName}")
-    public String DEFAULT_LOGGER_ACCESS="special-access-log";
-    @Value("${first-filter.rawLogName}")
-    public String DEFAULT_LOGGER_RAW="special-raw-log";
+
+    public static String DEFAULT_LOGGER_ACCESS="special-access-log";
+
+    public static String DEFAULT_LOGGER_RAW="special-raw-log";
+
+    @Autowired
+    FirstFilterProperties properties;
+
+    @Autowired
+    IdProvider idProvider;
+
+    public IdProvider getIdProvider() {
+        return idProvider;
+    }
+
+    public void setIdProvider(IdProvider idProvider) {
+        this.idProvider = idProvider;
+    }
+
+    @PostConstruct
+    public void init(){
+        if(StringUtils.isNotBlank(properties.getLogging().getAccessLogName()))
+            DEFAULT_LOGGER_ACCESS = properties.getLogging().getAccessLogName();
+        if(StringUtils.isNotBlank(properties.getLogging().getRawLogName()))
+            DEFAULT_LOGGER_RAW = properties.getLogging().getRawLogName();
+
+    }
 
     private boolean enableRequestAccessLog = false;
     private boolean enableRequestRawLog = false;
@@ -87,7 +111,18 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     private List<AccessResponseLogging> accessResponseLoggings = new ArrayList<>();
     private RequestModifier requestModifier = req->{};
     private ResponseModifier responseModifier = res->{};
-    private Supplier<String> appInfo = ()-> String.format(ManagementFactory.getRuntimeMXBean().getName());
+
+    @Autowired
+    private AppNameProvider appNameProvider = new NoneAppNameProvider();
+
+    public AppNameProvider getAppNameProvider() {
+        return appNameProvider;
+    }
+
+    public void setAppNameProvider(AppNameProvider appNameProvider) {
+        this.appNameProvider = appNameProvider;
+    }
+
 
     public void setRawResponseLoggings(List<RawResponseLogging> rawResponseLoggings) {
         this.rawResponseLoggings = rawResponseLoggings;
@@ -95,20 +130,6 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
     public void setAccessResponseLoggings(List<AccessResponseLogging> accessResponseLoggings) {
         this.accessResponseLoggings = accessResponseLoggings;
-    }
-
-    public void setAppInfo(Supplier<String> appInfo) {
-        this.appInfo = appInfo;
-    }
-
-    String timestamp = DateFactory.now().format(DateFormatBuilder.Format.NUMBER_DATETIME);
-    AtomicLong longProvider = new AtomicLong(0);
-    private Supplier<String> transactionIdProvider = ()->{
-        return timestamp+"_"+ String.format("%09d", longProvider.incrementAndGet());
-    };
-
-    public void setTransactionIdProvider(Supplier<String> transactionIdProvider) {
-        this.transactionIdProvider = transactionIdProvider;
     }
 
     public void setRequestHeader(RequestModifier modifier) {
@@ -161,7 +182,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
         MDC.clear();
 
-        MDC.put(APP_NAME,appInfo.get());
+        MDC.put(APP_NAME,appNameProvider.gen());
 
         ServletRequest newRequest = servletRequest;
 
@@ -187,7 +208,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
                     ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_LEVEL, transactionLevel);
             }
             else{
-                String id = transactionIdProvider.get();
+                String id = idProvider.gen();
                 String level = 0 + "";
                 MDC.put(TRANSACTION_HEADER, id);
                 MDC.put(TRANSACTION_LEVEL,level);
