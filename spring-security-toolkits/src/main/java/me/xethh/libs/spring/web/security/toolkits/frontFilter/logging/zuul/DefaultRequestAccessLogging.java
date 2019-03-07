@@ -1,11 +1,11 @@
-package me.xethh.libs.spring.web.security.toolkits.frontFilter.log.impl;
+package me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul;
 
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +16,18 @@ import java.util.List;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 
-public class DefaultAccessLogging implements AccessLogging {
+public class DefaultRequestAccessLogging implements RequestAccessLogging {
+
+    private Logger logger;
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
     private SimpleDateFormat format = DateFormatBuilder.Format.ISO8601.getFormatter();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
     public interface CustomMessage{
@@ -30,8 +41,8 @@ public class DefaultAccessLogging implements AccessLogging {
     }
 
     @Override
-    public void log(Logger logger, ServletRequest servletRequest) {
-        String label = "SPR_REQ_ACC_V1";
+    public void log(ServletRequest servletRequest) {
+        String label = "ZUU_REQ_ACC_V1";
         performanceLog.logStart(label,logger);
         StringBuilder sb = new StringBuilder();
         //Prefix

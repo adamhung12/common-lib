@@ -4,25 +4,29 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessResponseLogging;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawResponseLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul.ResponseAccessLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul.ResponseRawLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
-import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_FORWARD_FILTER_ORDER;
 
 public class ZuulPostFilter extends ZuulFilter implements WithLogger {
-    List<AccessResponseLogging> accessResponseLoggingList = new ArrayList<>();
-    List<RawResponseLogging> rawResponseLoggings = new ArrayList<>();
+    @Autowired
+    private List<ResponseRawLogging> responseRawLoggings = new ArrayList<>();
+    @Autowired
+    private List<ResponseAccessLogging> responseAccessLoggings = new ArrayList<>();
+    @Value("${first-filter.zuul.response-access-log.enabled}")
     private boolean enableResponseAccessLog = false;
+    @Value("${first-filter.zuul.response-raw-log.enabled}")
     private boolean enableResponseRawLog = false;
 
     public void setEnableResponseAccessLog(boolean enableResponseAccessLog) {
@@ -33,12 +37,8 @@ public class ZuulPostFilter extends ZuulFilter implements WithLogger {
         this.enableResponseRawLog = enableResponseRawLog;
     }
 
-    public void setAccessResponseLoggingList(List<AccessResponseLogging> accessResponseLoggingList) {
-        this.accessResponseLoggingList = accessResponseLoggingList;
-    }
-
-    public void setRawResponseLoggings(List<RawResponseLogging> rawResponseLoggings) {
-        this.rawResponseLoggings = rawResponseLoggings;
+    public void setResponseRawLoggings(List<ResponseRawLogging> responseRawLoggings) {
+        this.responseRawLoggings = responseRawLoggings;
     }
 
     @Override
@@ -56,42 +56,16 @@ public class ZuulPostFilter extends ZuulFilter implements WithLogger {
         return true;
     }
 
-    Supplier<Logger> accessLogProvider = ()->logger();
-    Supplier<Logger> rawLogProvider = ()->logger();
-
-    public void setAccessLogProvider(Supplier<Logger> accessLogProvider) {
-        this.accessLogProvider = accessLogProvider;
-    }
-
-    public void setRawLogProvider(Supplier<Logger> rawLogProvider) {
-        this.rawLogProvider = rawLogProvider;
-    }
-
     SimpleDateFormat sdf = DateFormatBuilder.Format.ISO8601.getFormatter();
     @Override
     public Object run() throws ZuulException {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletResponse res = ctx.getResponse();
         if(!(res instanceof CachingResponseWrapper)){
-            CachingResponseWrapper response = new CachingResponseWrapper(res, rawResponseLoggings
-                    , accessResponseLoggingList,accessLogProvider,rawLogProvider,enableResponseAccessLog
-                    ,enableResponseRawLog
-            );
+            CachingResponseWrapper response = new CachingResponseWrapper(res, enableResponseRawLog, responseRawLoggings
+                    , responseAccessLoggings,enableResponseAccessLog);
             ctx.setResponse(response);
         }
-        // Logger logger = logger();
-        // StringBuilder sb = new StringBuilder();
-        // String NewLine = "\r\n";
-        // sb
-        //         .append("<<<ZR_V1<<")
-        //         .append(sdf.format(new Date())).append("|")
-        //         .append(System.nanoTime()).append("|")
-        //         .append(ctx.getResponseStatusCode()).append("|")
-        //         .append(res.getHeaders(TRANSACTION_HEADER)).append("|")
-        //         .append(res.getHeaders(TRANSACTION_LEVEL)).append("|")
-        //         .append("<<<||")
-        // ;
-        // logger.info(sb.toString());
         return null;
     }
 }

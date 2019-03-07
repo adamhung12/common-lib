@@ -1,7 +1,6 @@
-package me.xethh.libs.spring.web.security.toolkits.zuulFilter.log.Impl;
+package me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessResponseLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
@@ -14,7 +13,17 @@ import java.util.List;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 
-public class DefaultAccessResponseLogging implements AccessResponseLogging {
+public class DefaultResponseAccessLogging implements ResponseAccessLogging {
+    private Logger logger;
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
     private SimpleDateFormat format = DateFormatBuilder.Format.ISO8601.getFormatter();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
     public interface CustomMessage{
@@ -28,8 +37,8 @@ public class DefaultAccessResponseLogging implements AccessResponseLogging {
     }
 
     @Override
-    public void log(Logger logger, CachingResponseWrapper responseWrapper) {
-        String label = "ZUU_RES_ACC_V1";
+    public void log(CachingResponseWrapper responseWrapper) {
+        String label = "SPR_RES_ACC_V1";
         performanceLog.logStart(label,logger);
         StringBuilder sb = new StringBuilder();
         sb

@@ -2,16 +2,23 @@ package me.xethh.libs.spring.web.security.toolkits.frontFilter;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
+import me.xethh.libs.spring.web.security.toolkits.MutableHttpRequestWrapper;
+import me.xethh.libs.spring.web.security.toolkits.MutableHttpRequest;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.AppNameProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.NoneAppNameProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProperties.FirstFilterProperties;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.RequestAccessLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.RequestRawLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.ResponseAccessLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.ResponseRawLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.requestModifier.RequestModifier;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.transactionIdProvider.IdProvider;
 import me.xethh.libs.toolkits.logging.WithLogger;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.GenericFilterBean;
@@ -24,7 +31,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,19 +70,91 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         this.idProvider = idProvider;
     }
 
-    @PostConstruct
-    public void init(){
-        if(StringUtils.isNotBlank(properties.getLogging().getAccessLogName()))
-            DEFAULT_LOGGER_ACCESS = properties.getLogging().getAccessLogName();
-        if(StringUtils.isNotBlank(properties.getLogging().getRawLogName()))
-            DEFAULT_LOGGER_RAW = properties.getLogging().getRawLogName();
+    @Value("${first-filter.webmvc.request-access-log.log-name}")
+    private String requestAccessLogName;
+    @Value("${first-filter.webmvc.request-access-log.enabled}")
+    private boolean enableRequestAccessLog ;
+    @Value("${first-filter.webmvc.request-raw-log.log-name}")
+    private String requestRawLogName;
+    @Value("${first-filter.webmvc.request-raw-log.enabled}")
+    private boolean enableRequestRawLog ;
 
+    @Value("${first-filter.webmvc.response-access-log.log-name}")
+    private String responseAccessLogName;
+    @Value("${first-filter.webmvc.response-access-log.enabled}")
+    private boolean enableResponseAccessLog ;
+    @Value("${first-filter.webmvc.response-raw-log.log-name}")
+    private String responseRawLogName;
+    @Value("${first-filter.webmvc.response-raw-log.enabled}")
+    private boolean enableResponseRawLog ;
+
+
+    @Value("${first-filter.webmvc.request-modification.enabled}")
+    private boolean enableRequestModification;
+
+    public String getResponseAccessLogName() {
+        return responseAccessLogName;
     }
 
-    private boolean enableRequestAccessLog = false;
-    private boolean enableRequestRawLog = false;
-    private boolean enableResponseAccessLog = false;
-    private boolean enableResponseRawLog = false;
+    public void setResponseAccessLogName(String responseAccessLogName) {
+        this.responseAccessLogName = responseAccessLogName;
+    }
+
+    public boolean isEnableResponseAccessLog() {
+        return enableResponseAccessLog;
+    }
+
+    public void setEnableResponseAccessLog(boolean enableResponseAccessLog) {
+        this.enableResponseAccessLog = enableResponseAccessLog;
+    }
+
+    public String getResponseRawLogName() {
+        return responseRawLogName;
+    }
+
+    public void setResponseRawLogName(String responseRawLogName) {
+        this.responseRawLogName = responseRawLogName;
+    }
+
+    public boolean isEnableResponseRawLog() {
+        return enableResponseRawLog;
+    }
+
+    public void setEnableResponseRawLog(boolean enableResponseRawLog) {
+        this.enableResponseRawLog = enableResponseRawLog;
+    }
+
+    public boolean isEnableRequestModification() {
+        return enableRequestModification;
+    }
+
+    public void setEnableRequestModification(boolean enableRequestModification) {
+        this.enableRequestModification = enableRequestModification;
+    }
+
+    public String getRequestAccessLogName() {
+        return requestAccessLogName;
+    }
+
+    public void setRequestAccessLogName(String requestAccessLogName) {
+        this.requestAccessLogName = requestAccessLogName;
+    }
+
+    public boolean isEnableRequestAccessLog() {
+        return enableRequestAccessLog;
+    }
+
+    public String getRequestRawLogName() {
+        return requestRawLogName;
+    }
+
+    public void setRequestRawLogName(String requestRawLogName) {
+        this.requestRawLogName = requestRawLogName;
+    }
+
+    public boolean isEnableRequestRawLog() {
+        return enableRequestRawLog;
+    }
 
     public void setEnableRequestAccessLog(boolean enableRequestAccessLog) {
         this.enableRequestAccessLog = enableRequestAccessLog;
@@ -86,17 +164,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         this.enableRequestRawLog = enableRequestRawLog;
     }
 
-    public void setEnableResponseAccessLog(boolean enableResponseAccessLog) {
-        this.enableResponseAccessLog = enableResponseAccessLog;
-    }
 
-    public void setEnableResponseRawLog(boolean enableResponseRawLog) {
-        this.enableResponseRawLog = enableResponseRawLog;
-    }
-
-    public interface RequestModifier{
-        void operation(CachingRequestWrapper requestWrapper);
-    }
     public interface ResponseModifier{
         void operation(CachingResponseWrapper responseWrapper);
     }
@@ -105,11 +173,17 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     private Supplier<String> accessLogName = ()->DEFAULT_LOGGER_ACCESS;
     private Supplier<String> rawLogName = ()->DEFAULT_LOGGER_RAW;
 
-    private List<AccessLogging> accessLoggingList = new ArrayList<>();
-    private List<RawRequestLogging> rawRequestLoggingList = new ArrayList<>();
-    private List<RawResponseLogging> rawResponseLoggings = new ArrayList<>();
-    private List<AccessResponseLogging> accessResponseLoggings = new ArrayList<>();
-    private RequestModifier requestModifier = req->{};
+    @Autowired
+    private List<RequestAccessLogging> accessRequestLoggingList = new ArrayList<>();
+    @Autowired
+    private List<RequestRawLogging> requestRawLoggingList = new ArrayList<>();
+    @Autowired
+    private List<ResponseRawLogging> responseRawLoggings = new ArrayList<>();
+    @Autowired
+    private List<ResponseAccessLogging> responseAccessLoggings = new ArrayList<>();
+
+    @Autowired
+    private List<RequestModifier> requestModifier = new ArrayList<>();
     private ResponseModifier responseModifier = res->{};
 
     @Autowired
@@ -124,27 +198,32 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     }
 
 
-    public void setRawResponseLoggings(List<RawResponseLogging> rawResponseLoggings) {
-        this.rawResponseLoggings = rawResponseLoggings;
+    public void setResponseRawLoggings(List<ResponseRawLogging> responseRawLoggings) {
+        this.responseRawLoggings = responseRawLoggings;
     }
 
-    public void setAccessResponseLoggings(List<AccessResponseLogging> accessResponseLoggings) {
-        this.accessResponseLoggings = accessResponseLoggings;
+    public void setResponseAccessLoggings(List<ResponseAccessLogging> responseAccessLoggings) {
+        this.responseAccessLoggings = responseAccessLoggings;
     }
 
-    public void setRequestHeader(RequestModifier modifier) {
-        this.requestModifier = modifier;
+    public List<RequestModifier> getRequestModifier() {
+        return requestModifier;
     }
+
+    public void setRequestModifier(List<RequestModifier> requestModifier) {
+        this.requestModifier = requestModifier;
+    }
+
     public void setResponseHeader(ResponseModifier modifier) {
         this.responseModifier = modifier;
     }
 
-    public void setAccessLoggingList(List<AccessLogging> accessLoggingList) {
-        this.accessLoggingList = accessLoggingList;
+    public void setAccessRequestLoggingList(List<RequestAccessLogging> accessRequestLoggingList) {
+        this.accessRequestLoggingList = accessRequestLoggingList;
     }
 
-    public void setRawRequestLoggingList(List<RawRequestLogging> rawRequestLoggingList) {
-        this.rawRequestLoggingList = rawRequestLoggingList;
+    public void setRequestRawLoggingList(List<RequestRawLogging> requestRawLoggingList) {
+        this.requestRawLoggingList = requestRawLoggingList;
     }
 
     private Logger firstFilterAccessLogger = LoggerFactory.getLogger(DEFAULT_LOGGER_ACCESS);
@@ -175,6 +254,10 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
     Pattern numberPattern = Pattern.compile("\\d+");
 
+    @PostConstruct
+    public void init(){
+    }
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         if(logger.isDebugEnabled())
@@ -187,9 +270,20 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         ServletRequest newRequest = servletRequest;
 
         if(newRequest instanceof HttpServletRequest){
-            newRequest = new CachingRequestWrapper((HttpServletRequest) newRequest);
-            if(requestModifier !=null)
-                requestModifier.operation((CachingRequestWrapper) newRequest);
+            //If raw log request, the request should cached
+            if(enableRequestRawLog)
+                newRequest = new CachingRequestWrapper((HttpServletRequest) newRequest);
+            // If request modification enabled, the request should be mutable
+            else if(enableRequestModification){
+                newRequest = new MutableHttpRequestWrapper((HttpServletRequest) newRequest);
+            }
+
+            //Modified the request based on initialized beans of request modifiers
+
+            if(enableRequestModification && requestModifier !=null && requestModifier.size()>0){
+                ServletRequest tempRequest = newRequest;
+                requestModifier.forEach(m->m.operation((MutableHttpRequest) tempRequest));
+            }
 
             Object transactionId = ((HttpServletRequest)servletRequest).getHeader(TRANSACTION_HEADER);
             if(transactionId!=null && transactionId instanceof String && !transactionId.equals("")){
@@ -208,10 +302,8 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
                     ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_LEVEL, transactionLevel);
             }
             else{
-                String id = idProvider.gen();
-                String level = 0 + "";
-                MDC.put(TRANSACTION_HEADER, id);
-                MDC.put(TRANSACTION_LEVEL,level);
+                MDC.put(TRANSACTION_HEADER, idProvider.gen());
+                MDC.put(TRANSACTION_LEVEL, 0 + "");
             }
             Object transactionAgent = ((HttpServletRequest)servletRequest).getHeader(TRANSACTION_AGENT);
             if(transactionAgent!=null && transactionAgent instanceof String && !transactionAgent.equals("")){
@@ -232,21 +324,20 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
         ServletResponse newResponse = servletResponse;
         if(newResponse instanceof HttpServletResponse){
-            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, rawResponseLoggings
-                    ,accessResponseLoggings,this::getFirstFilterAccessLogger,this::getFirstFilterRawLogger
-                    ,enableResponseAccessLog,enableResponseRawLog
+            newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, enableResponseRawLog, responseRawLoggings
+                    , responseAccessLoggings ,enableResponseAccessLog
             );
             if(responseModifier != null)
                 responseModifier.operation((CachingResponseWrapper) newResponse);
         }
 
-        if(enableRequestAccessLog && accessLoggingList.size()>0){
+        if(enableRequestAccessLog && accessRequestLoggingList.size()>0){
             ServletRequest finalNewRequest = newRequest;
-            accessLoggingList.stream().forEach(x->x.log(getFirstFilterAccessLogger(), finalNewRequest));
+            accessRequestLoggingList.stream().forEach(x->x.log(finalNewRequest));
         }
-        if(enableRequestRawLog && rawRequestLoggingList.size()>0){
+        if(enableRequestRawLog && requestRawLoggingList.size()>0){
             ServletRequest finalNewRequest1 = newRequest;
-            rawRequestLoggingList.stream().forEach(x->x.log(getFirstFilterRawLogger(), finalNewRequest1));
+            requestRawLoggingList.stream().forEach(x->x.log(finalNewRequest1));
         }
 
         filterChain.doFilter(newRequest,newResponse);

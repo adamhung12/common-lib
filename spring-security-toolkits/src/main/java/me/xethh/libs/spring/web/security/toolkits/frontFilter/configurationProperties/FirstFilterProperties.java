@@ -8,10 +8,116 @@ public class FirstFilterProperties {
 
     private String serviceId;
     private Editing edit;
-    private Log logging;
     private TransactionIdConfig transactionId;
     private AppNameConfig appNameProvider;
+    private WebMvcConfig webmvc;
+    private ZuulConfig zuul;
 
+    public static class WebMvcConfig{
+        private Log requestAccessLog;
+        private Log requestRawLog;
+        private Log responseAccessLog;
+        private Log responseRawLog;
+        private RequestResponseModification requestModification;
+
+        public Log getRequestAccessLog() {
+            return requestAccessLog;
+        }
+
+        public void setRequestAccessLog(Log requestAccessLog) {
+            this.requestAccessLog = requestAccessLog;
+        }
+
+        public Log getRequestRawLog() {
+            return requestRawLog;
+        }
+
+        public void setRequestRawLog(Log requestRawLog) {
+            this.requestRawLog = requestRawLog;
+        }
+
+
+        public RequestResponseModification getRequestModification() {
+            return requestModification;
+        }
+
+        public void setRequestModification(RequestResponseModification requestModification) {
+            this.requestModification = requestModification;
+        }
+
+        public Log getResponseAccessLog() {
+            return responseAccessLog;
+        }
+
+        public void setResponseAccessLog(Log responseAccessLog) {
+            this.responseAccessLog = responseAccessLog;
+        }
+
+        public Log getResponseRawLog() {
+            return responseRawLog;
+        }
+
+        public void setResponseRawLog(Log responseRawLog) {
+            this.responseRawLog = responseRawLog;
+        }
+
+    }
+    public static class ZuulConfig{
+        private Log requestAccessLog;
+        private Log requestRawLog;
+        private Log responseAccessLog;
+        private Log responseRawLog;
+        private RequestResponseModification requestModification;
+        private RequestResponseModification responseModification;
+
+        public Log getRequestAccessLog() {
+            return requestAccessLog;
+        }
+
+        public void setRequestAccessLog(Log requestAccessLog) {
+            this.requestAccessLog = requestAccessLog;
+        }
+
+        public Log getRequestRawLog() {
+            return requestRawLog;
+        }
+
+        public void setRequestRawLog(Log requestRawLog) {
+            this.requestRawLog = requestRawLog;
+        }
+
+        public Log getResponseAccessLog() {
+            return responseAccessLog;
+        }
+
+        public void setResponseAccessLog(Log responseAccessLog) {
+            this.responseAccessLog = responseAccessLog;
+        }
+
+        public Log getResponseRawLog() {
+            return responseRawLog;
+        }
+
+        public void setResponseRawLog(Log responseRawLog) {
+            this.responseRawLog = responseRawLog;
+        }
+
+        public RequestResponseModification getRequestModification() {
+            return requestModification;
+        }
+
+        public void setRequestModification(RequestResponseModification requestModification) {
+            this.requestModification = requestModification;
+        }
+
+        public RequestResponseModification getResponseModification() {
+            return responseModification;
+        }
+
+        public void setResponseModification(RequestResponseModification responseModification) {
+            this.responseModification = responseModification;
+        }
+    }
     public static class AppNameConfig{
        public enum BuildType{
            Default, None, Custom
@@ -61,24 +167,35 @@ public class FirstFilterProperties {
             this.enabled = enabled;
         }
     }
+    public static class RequestResponseModification{
+        private boolean enabled;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+    }
     public static class Log{
-        private String accessLogName;
-        private String rawLogName;
+        private boolean enabled;
+        private String logName;
 
-        public String getAccessLogName() {
-            return accessLogName;
+        public boolean isEnabled() {
+            return enabled;
         }
 
-        public void setAccessLogName(String accessLogName) {
-            this.accessLogName = accessLogName;
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
 
-        public String getRawLogName() {
-            return rawLogName;
+        public String getLogName() {
+            return logName;
         }
 
-        public void setRawLogName(String rawLogName) {
-            this.rawLogName = rawLogName;
+        public void setLogName(String logName) {
+            this.logName = logName;
         }
     }
 
@@ -98,14 +215,6 @@ public class FirstFilterProperties {
         this.edit = edit;
     }
 
-    public Log getLogging() {
-        return logging;
-    }
-
-    public void setLogging(Log logging) {
-        this.logging = logging;
-    }
-
     public String getServiceId() {
         return serviceId;
     }
@@ -120,5 +229,20 @@ public class FirstFilterProperties {
 
     public void setAppNameProvider(AppNameConfig appNameProvider) {
         this.appNameProvider = appNameProvider;
+    }
+    public ZuulConfig getZuul() {
+        return zuul;
+    }
+
+    public void setZuul(ZuulConfig zuul) {
+        this.zuul = zuul;
+    }
+
+    public WebMvcConfig getWebmvc() {
+        return webmvc;
+    }
+
+    public void setWebmvc(WebMvcConfig webmvc) {
+        this.webmvc = webmvc;
     }
 }

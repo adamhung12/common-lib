@@ -1,8 +1,7 @@
-package me.xethh.libs.spring.web.security.toolkits.frontFilter.log.impl;
+package me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawRequestLogging;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
@@ -15,13 +14,23 @@ import java.util.Enumeration;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 
-public class DefaultRawRequestLogging implements RawRequestLogging {
+public class DefaultRequestRawLogging implements RequestRawLogging {
+    private Logger logger;
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
     private boolean passwordProtection = true;
     private SimpleDateFormat format = DateFormatBuilder.Format.ISO8601.getFormatter();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
     @Override
-    public void log(Logger logger, ServletRequest servletRequest) {
-        String label = "SPR_REQ_RAW_V1";
+    public void log(ServletRequest servletRequest) {
+        String label = "ZUU_REQ_RAW_V1";
         performanceLog.logStart(label,logger);
         StringBuilder sb = new StringBuilder();
         String NewLine = "\r\n";

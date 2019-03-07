@@ -1,9 +1,8 @@
-package me.xethh.libs.spring.web.security.toolkits.zuulFilter.log.Impl;
+package me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawResponseLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.PerformanceLog;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,21 +11,30 @@ import org.slf4j.MDC;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 
-public class DefaultRawResponseLogging implements RawResponseLogging {
+public class DefaultResponseRawLogging implements ResponseRawLogging {
+    private Logger logger;
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
     private SimpleDateFormat format = DateFormatBuilder.Format.ISO8601.getFormatter();
     PerformanceLog performanceLog = PerformanceLog.staticLog;
 
+    List<CustomInfoLog> customInfoLogs = new ArrayList<>();
+
     @Override
-    public void log(Logger logger, ServletResponse servletResponse) {
-        String label = "ZUU_RES_RAW_V1";
+    public void log(ServletResponse servletResponse) {
+        String label = "SPR_RES_RAW_V1";
         performanceLog.logStart(label,logger);
         StringBuilder sb = new StringBuilder();
         String NewLine = "\r\n";
@@ -82,8 +90,6 @@ public class DefaultRawResponseLogging implements RawResponseLogging {
     public interface CustomInfoLog{
         void log(StringBuilder sb, ServletResponse servletResponse);
     }
-
-    List<CustomInfoLog> customInfoLogs = Arrays.asList((sb, servletResponse) -> {});
 
     public void setCustomInfoLogs(List<CustomInfoLog> customInfoLogs) {
         this.customInfoLogs = customInfoLogs;

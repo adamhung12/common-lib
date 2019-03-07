@@ -1,10 +1,9 @@
 package me.xethh.libs.spring.web.security.toolkits;
 
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.AccessResponseLogging;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.RawResponseLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.common.ResponseAccessLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.common.ResponseRawLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
@@ -15,24 +14,17 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
-public class CachingResponseWrapper extends HttpServletResponseWrapper implements WithLogger {
+public class CachingResponseWrapper<AccessLogging extends ResponseAccessLogging, RawLogging extends ResponseRawLogging> extends HttpServletResponseWrapper implements WithLogger {
     public interface LogOperation{
         void log(CachingResponseWrapper responseWrapper);
     }
     HttpServletResponse response;
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-    List<RawResponseLogging> responseLoggings ;
-    List<AccessResponseLogging> accessResponseLoggings;
+    List<RawLogging> responseLoggings ;
+    List<AccessLogging> responseAccessLoggings;
 
-    Supplier<Logger> accessLoggerProvider = this::logger;
-    Supplier<Logger> rawLoggerProvider = this::logger;
-
-    public void setAccessResponseLoggings(List<AccessResponseLogging> accessResponseLoggings) {
-        this.accessResponseLoggings = accessResponseLoggings;
-    }
 
     /**
      * Constructs a response adaptor wrapping the given response.
@@ -41,7 +33,7 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
      * @throws IllegalArgumentException if the response is null
      */
     public CachingResponseWrapper(HttpServletResponse response) {
-        this(response,new ArrayList<>(),new ArrayList<>(),null,null, false, false);
+        this(response,false, new ArrayList<>(),new ArrayList<>(),false);
     }
 
     private boolean enableResponseAccessLog = false;
@@ -57,19 +49,15 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
 
     public CachingResponseWrapper(
             HttpServletResponse response,
-            List<RawResponseLogging> rawResponseLoggings,
-            List<AccessResponseLogging> accessResponseLoggings,
-            Supplier<Logger> accessLoggerProvider,
-            Supplier<Logger> rawLoggerProvider,
-            boolean enableResponseAccessLog,
-            boolean enableResponseRawLog
+            boolean enableResponseRawLog,
+            List<RawLogging> responseRawLoggings,
+            List<AccessLogging> responseAccessLoggings,
+            boolean enableResponseAccessLog
     ) {
         super(response);
         this.response = response;
-        this.accessResponseLoggings = accessResponseLoggings;
-        this.responseLoggings = rawResponseLoggings;
-        this.accessLoggerProvider = accessLoggerProvider==null?()->logger():accessLoggerProvider;
-        this.rawLoggerProvider = rawLoggerProvider==null?()->logger():rawLoggerProvider;
+        this.responseAccessLoggings = responseAccessLoggings;
+        this.responseLoggings = responseRawLoggings;
         this.enableResponseAccessLog = enableResponseAccessLog;
         this.enableResponseRawLog = enableResponseRawLog;
     }
@@ -98,9 +86,9 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
 
         //Serve case when flush with buff of servlet
         if(enableResponseRawLog && responseLoggings.size()>0)
-            responseLoggings.forEach(x->x.log(rawLoggerProvider.get(),rs));
-        if(enableResponseAccessLog && accessResponseLoggings.size()>0)
-            accessResponseLoggings.stream().forEach(x->x.log(accessLoggerProvider.get(),rs));
+            responseLoggings.forEach(x->x.log(rs));
+        if(enableResponseAccessLog && responseAccessLoggings.size()>0)
+            responseAccessLoggings.stream().forEach(x->x.log(rs));
     }
 
     ServletOutputStream _stream;
@@ -133,9 +121,9 @@ public class CachingResponseWrapper extends HttpServletResponseWrapper implement
                     if(!flushed){
                         //Serve case when flush with output stream
                         if(enableResponseRawLog && responseLoggings.size()>0)
-                            responseLoggings.forEach(x->x.log(rawLoggerProvider.get(),rs));
-                        if(enableResponseAccessLog && accessResponseLoggings.size()>0)
-                            accessResponseLoggings.stream().forEach(x->x.log(accessLoggerProvider.get(),rs));
+                            responseLoggings.forEach(x->x.log(rs));
+                        if(enableResponseAccessLog && responseAccessLoggings.size()>0)
+                            responseAccessLoggings.stream().forEach(x->x.log(rs));
                         flushed = true;
                     }
                 }
