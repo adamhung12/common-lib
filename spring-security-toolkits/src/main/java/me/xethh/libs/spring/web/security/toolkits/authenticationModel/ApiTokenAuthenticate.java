@@ -6,6 +6,21 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 
 public class ApiTokenAuthenticate extends UsernamePasswordAuthenticationToken {
+    public static class ApiTokenAuthority implements GrantedAuthority {
+
+        public static ApiTokenAuthority of(String authority){
+            return new ApiTokenAuthority(authority);
+        }
+        ApiTokenAuthority(String authority){
+            this.authority = authority;
+        }
+        String authority;
+
+        @Override
+        public String getAuthority() {
+            return authority;
+        }
+    }
 
     /**
      * Creates a token with the supplied array of authorities.

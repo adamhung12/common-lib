@@ -2,10 +2,11 @@ package me.xethh.libs.spring.web.security.toolkits.preAuthenFilter;
 
 import me.xethh.libs.spring.web.security.toolkits.authenticationModel.ApiTokenAuthenticate;
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.GeneralExceptionModelImpl;
-import me.xethh.utils.dateManipulation.DateFactory;
-import me.xethh.utils.wrapper.Tuple2;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -13,8 +14,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
+import java.util.Arrays;
+
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_CLIENT_ID;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_SESSION_ID;
+import static org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME;
 
 public class PreTokenFilter extends OncePerRequestFilter {
     ExceptionSetter advice;
@@ -22,10 +27,11 @@ public class PreTokenFilter extends OncePerRequestFilter {
         this.advice = advice;
     }
 
-    TokenInfoGetter tokenInfoGetter = token -> null;
 
-    public void setTokenInfoGetter(TokenInfoGetter tokenInfoGetter) {
-        this.tokenInfoGetter = tokenInfoGetter;
+    FindByIndexNameSessionRepository findByIndexNameSessionRepository;
+
+    public void setFindByIndexNameSessionRepository(FindByIndexNameSessionRepository findByIndexNameSessionRepository) {
+        this.findByIndexNameSessionRepository = findByIndexNameSessionRepository;
     }
 
     @Override
@@ -33,14 +39,25 @@ public class PreTokenFilter extends OncePerRequestFilter {
         String header = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
         if(header!=null && header.length()>7 && header.substring(0,7).toLowerCase().equals("bearer ")){
             String token = header.substring(7);
-            Tuple2<String, Date> tokenValue = tokenInfoGetter.getTokenInfo(token);
 
-            if(tokenValue==null){
+            Session session = findByIndexNameSessionRepository.findById(token);
+            if(session==null){
                 advice.setException(httpServletResponse, new GeneralExceptionModelImpl.TokenNotValid());
                 return;
             }
-            if(tokenValue.getV1()!=null && tokenValue.getV2()!=null && DateFactory.now().beforeEqual(tokenValue.getV2())){
-                SecurityContextHolder.getContext().setAuthentication(new ApiTokenAuthenticate(tokenValue.getV1(),token,new ArrayList<>()));
+            if(!session.isExpired()){
+                session.setLastAccessedTime(Instant.now());
+                findByIndexNameSessionRepository.save(session);
+                SecurityContextHolder.getContext()
+                        .setAuthentication(
+                                new ApiTokenAuthenticate(
+                                        session.getAttribute(PRINCIPAL_NAME_INDEX_NAME),
+                                        token,
+                                        Arrays.asList(ApiTokenAuthenticate.ApiTokenAuthority.of("ROLE_api_user"))
+                                )
+                        );
+                MDC.put(TRANSACTION_SESSION_ID, session.getId());
+                MDC.put(TRANSACTION_CLIENT_ID, session.getAttribute(TRANSACTION_CLIENT_ID));
             }
             else{
                 advice.setException(httpServletResponse, new GeneralExceptionModelImpl.TokenNotValid());

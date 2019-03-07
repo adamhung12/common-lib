@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.*;
 
-public class MutableHttpRequestWrapper extends HttpServletRequestWrapper implements MutableRequest{
+public class MutableHttpRequestWrapper extends HttpServletRequestWrapper implements MutableHttpRequest {
     private final Map<String, String> customHeaders;
 
     public MutableHttpRequestWrapper(HttpServletRequest request) {

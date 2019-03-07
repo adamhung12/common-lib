@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class CachingRequestWrapper extends HttpServletRequestWrapper implements MutableRequest {
+public class CachingRequestWrapper extends HttpServletRequestWrapper implements MutableHttpRequest {
     /**
      * Constructs a request object wrapping the given request.
      *

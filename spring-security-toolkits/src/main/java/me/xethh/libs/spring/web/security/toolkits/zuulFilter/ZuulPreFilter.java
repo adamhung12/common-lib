@@ -3,22 +3,55 @@ package me.xethh.libs.spring.web.security.toolkits.zuulFilter;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProperties.FirstFilterProperties;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul.RequestAccessLogging;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul.RequestRawLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
-import org.slf4j.Logger;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_LEVEL;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSFERRING_MESSAGES;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_FORWARD_FILTER_ORDER;
 
+@EnableConfigurationProperties(FirstFilterProperties.class)
 public class ZuulPreFilter extends ZuulFilter implements WithLogger {
+    @Value("${first-filter.zuul.request-access-log.enabled}")
+    private boolean enableRequestAccessLog;
+    @Value("${first-filter.zuul.request-raw-log.enabled}")
+    private boolean enableRequestRawLog;
+    @Autowired
+    private List<RequestAccessLogging> accessRequestLoggingList = new ArrayList<>();
+    @Autowired
+    private List<RequestRawLogging> requestRawLoggingList = new ArrayList<>();
+
+    public boolean isEnableRequestAccessLog() {
+        return enableRequestAccessLog;
+    }
+
+    public void setEnableRequestAccessLog(boolean enableRequestAccessLog) {
+        this.enableRequestAccessLog = enableRequestAccessLog;
+    }
+
+    public boolean isEnableRequestRawLog() {
+        return enableRequestRawLog;
+    }
+
+    public void setEnableRequestRawLog(boolean enableRequestRawLog) {
+        this.enableRequestRawLog = enableRequestRawLog;
+    }
+
     @Override
     public String filterType() {
         return PRE_TYPE;
@@ -26,7 +59,7 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
 
     @Override
     public int filterOrder() {
-        return SEND_FORWARD_FILTER_ORDER-1;
+        return SEND_FORWARD_FILTER_ORDER - 1;
     }
 
     @Override
@@ -34,25 +67,29 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
         return true;
     }
 
-    SimpleDateFormat sdf = DateFormatBuilder.ISO8601();
+    SimpleDateFormat sdf = DateFormatBuilder.Format.ISO8601.getFormatter();
+
     @Override
     public Object run() throws ZuulException {
         RequestContext ctx = RequestContext.getCurrentContext();
-        ctx.addZuulRequestHeader(TRANSACTION_HEADER, MDC.get(TRANSACTION_HEADER));
-        ctx.addZuulRequestHeader(TRANSACTION_LEVEL, MDC.get(TRANSACTION_LEVEL));
+        for (Map.Entry<String, String> keySet : MDC.getCopyOfContextMap().entrySet()) {
+            if (TRANSFERRING_MESSAGES.contains(keySet.getKey())) {
+                ctx.addZuulRequestHeader(keySet.getKey(), keySet.getValue());
+            }
+
+        }
 
         HttpServletRequest req = ctx.getRequest();
-        Logger logger = logger();
-        StringBuilder sb = new StringBuilder();
-        String NewLine = "\r\n";
-        sb
-                .append(">>>ZR_V1>>")
-                .append(sdf.format(new Date())).append("|")
-                .append(System.nanoTime()).append("|")
-                .append(ctx.getZuulRequestHeaders().get(TRANSACTION_HEADER)).append("|")
-                .append(">>>||")
-        ;
-        logger.info(sb.toString());
+        if (enableRequestAccessLog && accessRequestLoggingList.size() > 0)
+            accessRequestLoggingList.stream().forEach(x -> x.log(req));
+        if (enableRequestRawLog && requestRawLoggingList.size() > 0)
+            requestRawLoggingList.stream().forEach(x -> x.log(req));
+
+        if (req instanceof CachingRequestWrapper) {
+            logger().info("Replacing the authentication");
+            req.removeAttribute("Authorization");
+            req.setAttribute("Authorization", Base64.getEncoder().encodeToString("CITIC_CPAAS_API:SAAPC_CITIC_@#21".getBytes()));
+        }
         return null;
     }
 }

@@ -2,7 +2,7 @@ package me.xethh.libs.spring.web.security.toolkits;
 
 import java.util.Enumeration;
 
-public interface MutableRequest {
+public interface MutableHttpRequest {
 
     void putHeader(String name, String value);
 
