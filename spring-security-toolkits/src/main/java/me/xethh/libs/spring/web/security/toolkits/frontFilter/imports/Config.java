@@ -1,16 +1,12 @@
 package me.xethh.libs.spring.web.security.toolkits.frontFilter.imports;
 
-import me.xethh.libs.spring.web.security.toolkits.MutableHttpRequest;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.*;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.AppNameProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.DefaultAppNameProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.NoneAppNameProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProperties.FirstFilterProperties;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.RequestAccessLogging;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.RequestRawLogging;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.ResponseAccessLogging;
-import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.ResponseRawLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.requestModifier.RequestModifier;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.responseModifier.ResponseModifier;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.transactionIdProvider.IdProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.transactionIdProvider.MachineBasedProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.transactionIdProvider.TimeBasedProvider;
@@ -18,14 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-import java.util.List;
-
 @EnableConfigurationProperties(FirstFilterProperties.class)
 public class Config {
 
 
     @Autowired FirstFilterProperties firstFilterProperties;
 
+    @Bean
+    public ResponseModifier defaultResponseModifier(){
+        return response->{};
+    }
     @Bean
     public RequestModifier defaultRequestModifier(){
         return request->{};

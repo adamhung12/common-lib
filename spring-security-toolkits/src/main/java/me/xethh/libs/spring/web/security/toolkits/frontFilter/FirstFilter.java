@@ -2,8 +2,8 @@ package me.xethh.libs.spring.web.security.toolkits.frontFilter;
 
 import me.xethh.libs.spring.web.security.toolkits.CachingRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.CachingResponseWrapper;
-import me.xethh.libs.spring.web.security.toolkits.MutableHttpRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.MutableHttpRequest;
+import me.xethh.libs.spring.web.security.toolkits.MutableHttpRequestWrapper;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.AppNameProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.appNameProvider.NoneAppNameProvider;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProperties.FirstFilterProperties;
@@ -12,6 +12,7 @@ import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.ResponseAccessLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.springWeb.impl.ResponseRawLogging;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.requestModifier.RequestModifier;
+import me.xethh.libs.spring.web.security.toolkits.frontFilter.responseModifier.ResponseModifier;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.transactionIdProvider.IdProvider;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import org.slf4j.Logger;
@@ -165,9 +166,6 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
     }
 
 
-    public interface ResponseModifier{
-        void operation(CachingResponseWrapper responseWrapper);
-    }
 
     private Logger logger = logger();
     private Supplier<String> accessLogName = ()->DEFAULT_LOGGER_ACCESS;
@@ -184,10 +182,19 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
     @Autowired
     private List<RequestModifier> requestModifier = new ArrayList<>();
-    private ResponseModifier responseModifier = res->{};
+    @Autowired
+    private List<ResponseModifier> responseModifiers = new ArrayList<>();
 
     @Autowired
     private AppNameProvider appNameProvider = new NoneAppNameProvider();
+
+    public List<ResponseModifier> getResponseModifiers() {
+        return responseModifiers;
+    }
+
+    public void setResponseModifiers(List<ResponseModifier> responseModifiers) {
+        this.responseModifiers = responseModifiers;
+    }
 
     public AppNameProvider getAppNameProvider() {
         return appNameProvider;
@@ -212,10 +219,6 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
     public void setRequestModifier(List<RequestModifier> requestModifier) {
         this.requestModifier = requestModifier;
-    }
-
-    public void setResponseHeader(ResponseModifier modifier) {
-        this.responseModifier = modifier;
     }
 
     public void setAccessRequestLoggingList(List<RequestAccessLogging> accessRequestLoggingList) {
@@ -327,17 +330,21 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
             newResponse = new CachingResponseWrapper((HttpServletResponse) newResponse, enableResponseRawLog, responseRawLoggings
                     , responseAccessLoggings ,enableResponseAccessLog
             );
-            if(responseModifier != null)
-                responseModifier.operation((CachingResponseWrapper) newResponse);
+            if(responseModifiers != null && responseModifiers.size()>0){
+                ServletResponse tempResponse = newResponse;
+                responseModifiers.forEach(m->m.operation((CachingResponseWrapper) tempResponse));
+            }
         }
 
+        //Start logging of access request
         if(enableRequestAccessLog && accessRequestLoggingList.size()>0){
             ServletRequest finalNewRequest = newRequest;
-            accessRequestLoggingList.stream().forEach(x->x.log(finalNewRequest));
+            accessRequestLoggingList.forEach(x->x.log(finalNewRequest));
         }
+        //Start logging of raw request
         if(enableRequestRawLog && requestRawLoggingList.size()>0){
             ServletRequest finalNewRequest1 = newRequest;
-            requestRawLoggingList.stream().forEach(x->x.log(finalNewRequest1));
+            requestRawLoggingList.forEach(x->x.log(finalNewRequest1));
         }
 
         filterChain.doFilter(newRequest,newResponse);
