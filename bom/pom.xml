@@ -12,7 +12,7 @@
 	</parent>
 	<groupId>me.xethh.libs.toolkits</groupId>
 	<artifactId>libs-bom</artifactId>
-	<version>1.4-RELEASE</version>
+	<version>1.4.1-RELEASE</version>
 
 	<!-- FIXME change it to the project's website -->
 	<url>http://www.example.com</url>

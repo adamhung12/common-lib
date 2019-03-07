@@ -6,7 +6,7 @@
 
   <groupId>me.xethh.libs</groupId>
   <artifactId>toolkits</artifactId>
-  <version>1.4-RELEASE</version>
+  <version>1.4.1-SNAPSHOT</version>
   <modules>
     <module>bom</module>
     <module>common</module>
