@@ -26,6 +26,31 @@
 				<artifactId>common</artifactId>
 				<version>1.4.2.SNAPSHOT</version>
 			</dependency>
+			<dependency>
+				<groupId>me.xethh.utils</groupId>
+				<artifactId>DateUtils</artifactId>
+				<version>6.0.0.RC1-RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>me.xethh.utils</groupId>
+				<artifactId>authUtils-spring</artifactId>
+				<version>1.0-RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>me.xethh.utils</groupId>
+				<artifactId>JDBCProvider</artifactId>
+				<version>1.1.1-RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>me.xethh.utils</groupId>
+				<artifactId>DecimalExtension</artifactId>
+				<version>2.0-RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>me.xethh.utils</groupId>
+				<artifactId>authUtils</artifactId>
+				<version>1.2-RELEASE</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
