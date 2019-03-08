@@ -47,17 +47,17 @@
 			<dependency>
 				<groupId>me.xethh.libs</groupId>
 				<artifactId>crawler</artifactId>
-				<version>1.4.2-SNAPSHOT</version>
+				<version>1.4.2-RELEASE</version>
 			</dependency>
 			<dependency>
 				<groupId>me.xethh.libs.toolkits</groupId>
 				<artifactId>spring-web-security</artifactId>
-				<version>1.4.2-SNAPSHOT</version>
+				<version>1.4.2-RELEASE</version>
 			</dependency>
 			<dependency>
 				<groupId>me.xethh.libs.toolkits</groupId>
 				<artifactId>common</artifactId>
-				<version>1.4.2.SNAPSHOT</version>
+				<version>1.4.2.RELEASE</version>
 			</dependency>
 			<dependency>
 				<groupId>me.xethh.utils</groupId>
