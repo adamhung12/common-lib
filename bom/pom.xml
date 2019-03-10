@@ -7,7 +7,7 @@
 
 	<groupId>me.xethh.libs.toolkits</groupId>
 	<artifactId>libs-bom</artifactId>
-	<version>1.4.3-RELEASE</version>
+	<version>1.4.4-RELEASE</version>
 	<name>libs-bom</name>
 
 	<!-- FIXME change it to the project's website -->
@@ -45,7 +45,7 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>me.xethh.libs</groupId>
+				<groupId>me.xethh.libs.toolkits</groupId>
 				<artifactId>crawler</artifactId>
 				<version>1.4.2-RELEASE</version>
 			</dependency>
@@ -57,7 +57,7 @@
 			<dependency>
 				<groupId>me.xethh.libs.toolkits</groupId>
 				<artifactId>common</artifactId>
-				<version>1.4.2.RELEASE</version>
+				<version>1.4.2-RELEASE</version>
 			</dependency>
 			<dependency>
 				<groupId>me.xethh.utils</groupId>
