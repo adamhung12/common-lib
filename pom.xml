@@ -17,6 +17,7 @@
     <module>common</module>
     <module>spring-security-toolkits</module>
 	  <module>crawler</module>
+      <module>excelProcessor</module>
   </modules>
   <packaging>pom</packaging>
 
