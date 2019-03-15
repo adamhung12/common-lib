@@ -5,7 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>me.xethh.archetype.quickstart</groupId>
     <artifactId>quickstart-lib</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <!--Migrated from me.xethh.archetype:quickstart:1.1-RELEASE -->
+    <version>1.0-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>

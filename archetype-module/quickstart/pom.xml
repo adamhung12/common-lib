@@ -5,7 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>me.xethh.archetype</groupId>
     <artifactId>quickstart</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <!--Migrated from me.xethh.archetype:quickstart:1.0-RELEASE -->
+    <version>1.1-RELEASE</version>
 
     <name>${project.artifactId}</name>
     <url>http://www.example.com</url>
