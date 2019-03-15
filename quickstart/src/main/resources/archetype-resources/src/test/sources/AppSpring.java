@@ -15,7 +15,7 @@ import java.io.File;
 public class AppSpring
 {
     public static void systemInit(){
-        File file = new File("./target/test/log/");
+        File file = new File("./target/test/logs/");
         file.mkdirs();
         System.setProperty("base.log.path",file.toString());
     }
