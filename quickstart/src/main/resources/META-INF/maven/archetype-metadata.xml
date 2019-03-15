@@ -8,16 +8,16 @@
         </requiredProperty>
     </requiredProperties>
     <fileSets>
-        <fileSet filtered="true" packaged="true">
+        <fileSet encoding="UTF-8" filtered="true" packaged="true">
             <directory>src/main/sources</directory>
         </fileSet>
-        <fileSet>
+        <fileSet encoding="UTF-8" filtered="true">
             <directory>src/main/resources</directory>
         </fileSet>
-        <fileSet filtered="true" packaged="true">
+        <fileSet encoding="UTF-8" filtered="true" packaged="true">
             <directory>src/test/sources</directory>
         </fileSet>
-        <fileSet>
+        <fileSet encoding="UTF-8" filtered="true">
             <directory>src/test/resources</directory>
         </fileSet>
     </fileSets>
