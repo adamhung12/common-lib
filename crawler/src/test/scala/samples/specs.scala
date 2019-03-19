@@ -8,7 +8,7 @@ import org.specs2.runner._
 /**
  * Sample specification.
  * 
- * This specification can be executed with: scala -cp <your classpath=""> ${package}.SpecsTest
+ * This specification can be executed with: sources -cp <your classpath=""> ${package}.SpecsTest
  * Or using maven: mvn test
  *
  * For more information on how to write or run specifications, please visit: 
