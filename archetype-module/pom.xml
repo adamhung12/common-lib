@@ -10,7 +10,7 @@
     <modules>
         <module>quickstart-lib</module>
         <module>quickstart</module>
-        <module>quickstart-scala-lib</module>
+        <module>quickstart-scala-app</module>
     </modules>
     <packaging>pom</packaging>
 
