@@ -1,0 +1,8 @@
+#set( $dollar = '$' )
+application:
+  name: ${artifactId}
+  package: ${package}
+spring:
+  application:
+    name: ${dollar}{application.name}
+
