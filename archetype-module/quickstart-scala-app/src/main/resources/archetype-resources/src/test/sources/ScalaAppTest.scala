@@ -3,7 +3,7 @@ package $package
 import org.junit.Test
 import org.junit.Assert.assertTrue
 
-class ScalaApp{
+class ScalaAppTest{
   @Test
   def test = {
     assertTrue(true)
