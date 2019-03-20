@@ -21,7 +21,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSFERRING_MESSAGES;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.TracingSystemConst.TRANSFERRING_MESSAGES;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_FORWARD_FILTER_ORDER;
 

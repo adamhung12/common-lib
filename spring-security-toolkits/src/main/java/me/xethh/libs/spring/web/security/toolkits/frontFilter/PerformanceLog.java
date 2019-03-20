@@ -3,7 +3,7 @@ package me.xethh.libs.spring.web.security.toolkits.frontFilter;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.TracingSystemConst.TRANSACTION_HEADER;
 
 public interface PerformanceLog {
     default void logStart(String label, Logger logger){

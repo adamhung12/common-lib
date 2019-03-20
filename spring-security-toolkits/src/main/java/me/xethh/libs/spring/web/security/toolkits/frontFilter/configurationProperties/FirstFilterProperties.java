@@ -67,8 +67,6 @@ public class FirstFilterProperties {
         private Log requestRawLog;
         private Log responseAccessLog;
         private Log responseRawLog;
-        private RequestResponseModification requestModification;
-        private RequestResponseModification responseModification;
 
         public Log getRequestAccessLog() {
             return requestAccessLog;
@@ -102,21 +100,6 @@ public class FirstFilterProperties {
             this.responseRawLog = responseRawLog;
         }
 
-        public RequestResponseModification getRequestModification() {
-            return requestModification;
-        }
-
-        public void setRequestModification(RequestResponseModification requestModification) {
-            this.requestModification = requestModification;
-        }
-
-        public RequestResponseModification getResponseModification() {
-            return responseModification;
-        }
-
-        public void setResponseModification(RequestResponseModification responseModification) {
-            this.responseModification = responseModification;
-        }
     }
     public static class AppNameConfig{
        public enum BuildType{

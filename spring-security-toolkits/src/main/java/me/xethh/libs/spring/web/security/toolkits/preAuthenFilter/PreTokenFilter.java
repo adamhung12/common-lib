@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
 
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_CLIENT_ID;
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_SESSION_ID;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.TracingSystemConst.TRANSACTION_CLIENT_ID;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.TracingSystemConst.TRANSACTION_SESSION_ID;
 import static org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME;
 
 public class PreTokenFilter extends OncePerRequestFilter {

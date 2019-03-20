@@ -38,20 +38,11 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.TracingSystemConst.*;
+
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class FirstFilter extends GenericFilterBean implements WithLogger {
-    public static String APP_NAME = "APP-NAME";
-    public static String TRANSACTION_HEADER = "CUST-TRANSACTION-ID";
-    public static String TRANSACTION_LEVEL = "CUST-TRANSACTION-LEVEL";
-    public static String TRANSACTION_AGENT = "CUST-TRANSACTION-AGENT";
-    public static String TRANSACTION_SESSION_ID = "CUST-TRANSACTION-SESSION-ID";
-    public static String TRANSACTION_CLIENT_ID = "CUST-CLIENT-ID";
-    public static List<String> TRANSFERRING_MESSAGES = Arrays.asList(
-            APP_NAME,TRANSACTION_HEADER,TRANSACTION_LEVEL,
-            TRANSACTION_AGENT,TRANSACTION_SESSION_ID
-    );
-
 
     public static String DEFAULT_LOGGER_ACCESS="special-access-log";
 
@@ -259,6 +250,49 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
     @PostConstruct
     public void init(){
+        logger.info("Initialized FirstFilter");
+    }
+
+    protected void MdcInit(){
+        MDC.clear();
+        MDC.put(APP_NAME,appNameProvider.gen());
+    }
+
+    private void tracingSystem(HttpServletRequest servletRequest, HttpServletResponse servletResponse){
+        Object transactionId = servletRequest.getHeader(TRANSACTION_HEADER);
+        if(transactionId!=null && transactionId instanceof String && !transactionId.equals("")){
+            MDC.put(TRANSACTION_HEADER, (String) transactionId);
+            String transactionLevel = servletRequest.getHeader(TRANSACTION_LEVEL);
+            if(transactionLevel!=null && numberPattern.matcher(transactionLevel).matches())
+                MDC.put(TRANSACTION_LEVEL, String.valueOf(Integer.parseInt(transactionLevel)+1));
+            else
+                throw new RuntimeException("Missing transaction level");
+
+
+            if(servletResponse.containsHeader(TRANSACTION_HEADER))
+                servletResponse.setHeader(TRANSACTION_HEADER, (String) transactionId);
+
+            if(servletResponse.containsHeader(TRANSACTION_LEVEL))
+                servletResponse.setHeader(TRANSACTION_LEVEL, transactionLevel);
+        }
+        else{
+            MDC.put(TRANSACTION_HEADER, idProvider.gen());
+            MDC.put(TRANSACTION_LEVEL, 0 + "");
+        }
+        Object transactionAgent = servletRequest.getHeader(TRANSACTION_AGENT);
+        if(transactionAgent!=null && transactionAgent instanceof String && !transactionAgent.equals("")){
+            MDC.put(TRANSACTION_AGENT, (String) transactionAgent);
+        }
+        else {
+            MDC.put(TRANSACTION_AGENT, "Client");
+        }
+        Object transactionSession = servletRequest.getHeader(TRANSACTION_SESSION_ID);
+        if(transactionSession!=null && transactionSession instanceof String && !transactionSession.equals("")){
+            MDC.put(TRANSACTION_SESSION_ID, (String) transactionSession);
+        }
+        else {
+            MDC.put(TRANSACTION_SESSION_ID, "");
+        }
     }
 
     @Override
@@ -266,19 +300,17 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
         if(logger.isDebugEnabled())
             logger.debug("Start first filter");
 
-        MDC.clear();
-
-        MDC.put(APP_NAME,appNameProvider.gen());
-
+        MdcInit();
         ServletRequest newRequest = servletRequest;
 
         if(newRequest instanceof HttpServletRequest){
             //If raw log request, the request should cached
+            newRequest = new CachingRequestWrapper((HttpServletRequest) newRequest);
             if(enableRequestRawLog)
-                newRequest = new CachingRequestWrapper((HttpServletRequest) newRequest);
+                ((CachingRequestWrapper)newRequest).setCacheable(true);
             // If request modification enabled, the request should be mutable
             else if(enableRequestModification){
-                newRequest = new MutableHttpRequestWrapper((HttpServletRequest) newRequest);
+                ((CachingRequestWrapper)newRequest).setEditable(true);
             }
 
             //Modified the request based on initialized beans of request modifiers
@@ -288,40 +320,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
                 requestModifier.forEach(m->m.operation((MutableHttpRequest) tempRequest));
             }
 
-            Object transactionId = ((HttpServletRequest)servletRequest).getHeader(TRANSACTION_HEADER);
-            if(transactionId!=null && transactionId instanceof String && !transactionId.equals("")){
-                MDC.put(TRANSACTION_HEADER, (String) transactionId);
-                String transactionLevel = ((HttpServletRequest) servletRequest).getHeader(TRANSACTION_LEVEL);
-                if(transactionLevel!=null && numberPattern.matcher(transactionLevel).matches())
-                    MDC.put(TRANSACTION_LEVEL, String.valueOf(Integer.parseInt(transactionLevel)+1));
-                else
-                    throw new RuntimeException("Missing transaction level");
-
-
-                if(((HttpServletResponse) servletResponse).containsHeader(TRANSACTION_HEADER))
-                    ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_HEADER, (String) transactionId);
-
-                if(((HttpServletResponse) servletResponse).containsHeader(TRANSACTION_LEVEL))
-                    ((HttpServletResponse) servletResponse).setHeader(TRANSACTION_LEVEL, transactionLevel);
-            }
-            else{
-                MDC.put(TRANSACTION_HEADER, idProvider.gen());
-                MDC.put(TRANSACTION_LEVEL, 0 + "");
-            }
-            Object transactionAgent = ((HttpServletRequest)servletRequest).getHeader(TRANSACTION_AGENT);
-            if(transactionAgent!=null && transactionAgent instanceof String && !transactionAgent.equals("")){
-                MDC.put(TRANSACTION_AGENT, (String) transactionAgent);
-            }
-            else {
-                MDC.put(TRANSACTION_AGENT, (String) "Client");
-            }
-            Object transactionSession = ((HttpServletRequest)servletRequest).getHeader(TRANSACTION_SESSION_ID);
-            if(transactionSession!=null && transactionSession instanceof String && !transactionSession.equals("")){
-                MDC.put(TRANSACTION_SESSION_ID, (String) transactionSession);
-            }
-            else {
-                MDC.put(TRANSACTION_SESSION_ID, (String) "");
-            }
+            tracingSystem((HttpServletRequest) newRequest, (HttpServletResponse) servletResponse);
 
         }
 

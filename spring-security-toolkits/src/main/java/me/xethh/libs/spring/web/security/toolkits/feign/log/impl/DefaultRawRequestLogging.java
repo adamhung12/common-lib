@@ -8,11 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.MDC;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType.FeignReq;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.TracingSystemConst.TRANSACTION_HEADER;
 
 public class DefaultRawRequestLogging implements RawRequestLogging {
     private boolean passwordProtection = true;

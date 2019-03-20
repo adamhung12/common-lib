@@ -12,8 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.TRANSACTION_HEADER;
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.RawLoggingType.FeignRes;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.TracingSystemConst.TRANSACTION_HEADER;
 
 public class DefaultRawResponseLogging implements RawResponseLogging {
     private SimpleDateFormat format = DateFormatBuilder.Format.ISO8601.getFormatter();

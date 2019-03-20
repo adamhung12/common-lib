@@ -4,6 +4,7 @@ import feign.RequestTemplate;
 import org.slf4j.MDC;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.FirstFilter.*;
+import static me.xethh.libs.spring.web.security.toolkits.frontFilter.TracingSystemConst.*;
 
 public class DefaultMDCInterceptor extends MDCInterceptor{
     @Override

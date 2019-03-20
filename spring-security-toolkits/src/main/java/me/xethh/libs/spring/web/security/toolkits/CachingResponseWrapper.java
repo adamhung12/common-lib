@@ -64,6 +64,7 @@ public class CachingResponseWrapper<AccessLogging extends ResponseAccessLogging,
 
 
     public byte[] getOutputContent(){
+        if(!enableResponseRawLog) throw new RuntimeException("Response cache is not enabled");
         return outputStream.toByteArray();
     }
     public String getOutputStringContent(){
@@ -73,10 +74,6 @@ public class CachingResponseWrapper<AccessLogging extends ResponseAccessLogging,
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    public interface Log{
-        void log();
     }
 
     @Override
@@ -102,7 +99,8 @@ public class CachingResponseWrapper<AccessLogging extends ResponseAccessLogging,
                 @Override
                 public void write(int b) throws IOException {
                     response.getOutputStream().write(b);
-                    outputStream.write(b);
+                    if(enableResponseRawLog)
+                        outputStream.write(b);
                 }
 
                 @Override
