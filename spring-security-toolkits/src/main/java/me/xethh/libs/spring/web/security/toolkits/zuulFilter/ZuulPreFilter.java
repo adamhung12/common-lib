@@ -31,6 +31,11 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
     private boolean enableRequestAccessLog;
     @Value("${first-filter.zuul.request-raw-log.enabled}")
     private boolean enableRequestRawLog;
+
+    @Autowired
+    private RouteAuthenticationSetter routeAuthenticationSetter;
+
+
     @Autowired
     private List<RequestAccessLogging> accessRequestLoggingList = new ArrayList<>();
     @Autowired
@@ -85,6 +90,7 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
         if (enableRequestRawLog && requestRawLoggingList.size() > 0)
             requestRawLoggingList.stream().forEach(x -> x.log(req));
 
+        routeAuthenticationSetter.set(ctx);
         if (req instanceof CachingRequestWrapper) {
             logger().info("Replacing the authentication");
             req.removeAttribute("Authorization");

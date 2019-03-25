@@ -1,6 +1,8 @@
 package me.xethh.libs.spring.web.security.toolkits.zuulFilter.imports;
 
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProperties.FirstFilterProperties;
+import me.xethh.libs.spring.web.security.toolkits.zuulFilter.DefaultRouteAuthenticationSetter;
+import me.xethh.libs.spring.web.security.toolkits.zuulFilter.RouteAuthenticationSetter;
 import me.xethh.libs.spring.web.security.toolkits.zuulFilter.ZuulPostFilter;
 import me.xethh.libs.spring.web.security.toolkits.zuulFilter.ZuulPreFilter;
 import org.slf4j.LoggerFactory;
@@ -30,5 +32,18 @@ public class Config {
     ){
         ZuulPostFilter zuulPostFilter =  new ZuulPostFilter();
         return zuulPostFilter;
+    }
+
+    @Bean
+    public RouteAuthenticationSetter routeAuthenticationSetter(
+            @Value("${first-filter.zuul.with-authen.authen-type:None}") FirstFilterProperties.AuthenType authenType,
+            @Value("${first-filter.zuul.with-authen.value:}") String configValue
+    ){
+        if(!authenType.equals(FirstFilterProperties.AuthenType.None) &&
+                (configValue==null || configValue.equals(""))
+        ){
+            throw new RuntimeException("Route authentication setter cannot be initiated with empty value");
+        }
+        return new DefaultRouteAuthenticationSetter();
     }
 }

@@ -67,6 +67,15 @@ public class FirstFilterProperties {
         private Log requestRawLog;
         private Log responseAccessLog;
         private Log responseRawLog;
+        private RouteWithAuthen withAuthen;
+
+        public RouteWithAuthen getWithAuthen() {
+            return withAuthen;
+        }
+
+        public void setWithAuthen(RouteWithAuthen withAuthen) {
+            this.withAuthen = withAuthen;
+        }
 
         public Log getRequestAccessLog() {
             return requestAccessLog;
@@ -159,6 +168,29 @@ public class FirstFilterProperties {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+    }
+    public static enum AuthenType{
+        None, Basic, Bear
+    }
+    public static class RouteWithAuthen{
+        private AuthenType authenType;
+        private String value;
+
+        public AuthenType getAuthenType() {
+            return authenType;
+        }
+
+        public void setAuthenType(AuthenType authenType) {
+            this.authenType = authenType;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
         }
     }
     public static class Log{
