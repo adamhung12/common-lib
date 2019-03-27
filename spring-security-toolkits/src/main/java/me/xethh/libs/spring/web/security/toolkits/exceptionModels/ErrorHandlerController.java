@@ -42,7 +42,7 @@ public class ErrorHandlerController implements ErrorController, WithLogger {
         if(exception!=null && exception instanceof Throwable){
             for(CustomExceptionHandler exceptionHandler : customExceptionHandlerList){
                 if(exceptionHandler.isSupported((Throwable) exception)){
-                    Optional<GeneralExceptionModel> object = exceptionHandler.dispatch((Throwable) exception);
+                    Optional<GeneralExceptionModel> object = exceptionHandler.dispatch((Throwable) exception, request);
                     if(object.isPresent()){
                         request.removeAttribute("javax.servlet.error.exception");
                         return object.get();
@@ -71,8 +71,7 @@ public class ErrorHandlerController implements ErrorController, WithLogger {
             if(statusObject  != null){
                 GeneralSSTExceptionModel returnObject = statusBasesGeneralSSTExceptionModelFactory.dispatch(statusObject);
                 if(returnObject!=null)
-                    return new UnknownError(null, "Unkown error E-9999999999994");
-                    // return returnObject;
+                    return returnObject;
             }
             return new UnknownError(null, "Unkown error E-9999999999991");
         }

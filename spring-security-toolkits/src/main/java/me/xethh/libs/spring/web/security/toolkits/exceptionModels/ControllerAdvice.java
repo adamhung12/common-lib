@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@org.springframework.web.bind.annotation.ControllerAdvice("me.xethh")
+@org.springframework.web.bind.annotation.ControllerAdvice("me.xethh.libs.spring.web.security.toolkits")
 public class ControllerAdvice extends ResponseEntityExceptionHandler implements ExceptionSetter,  WithLogger {
     @PostConstruct
     public void Init() {
@@ -49,6 +49,10 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler implements 
     // @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public Object handleResourceNotFoundException(Exception ex) {
+        if(ex instanceof GeneralSSTExceptionModel){
+            return ((GeneralThrowable)ex).getException();
+
+        }
         logger().info(ex.getMessage(),ex);
         return ex;
     }
@@ -102,64 +106,55 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler implements 
     protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         BindingResult result = ex.getBindingResult();
-        GeneralExceptionModelImpl.MethodArgumentNotValid arg = new GeneralExceptionModelImpl.MethodArgumentNotValid(result);
-        return setException(arg);
+        return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.MethodArgumentNotValid(status, result),status);
 
     }
 
@@ -167,35 +162,30 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler implements 
     protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, HttpHeaders headers, HttpStatus status, WebRequest webRequest) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(ex);
         return new ResponseEntity<Object>(new StatusBasesGeneralSSTExceptionModelFactory.OtherError(status,null),status);
-        return setException(new GeneralExceptionModelImpl.OtherError(status));
     }
 
 }

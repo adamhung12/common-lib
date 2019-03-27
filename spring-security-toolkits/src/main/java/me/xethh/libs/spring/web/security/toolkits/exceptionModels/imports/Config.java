@@ -1,5 +1,6 @@
 package me.xethh.libs.spring.web.security.toolkits.exceptionModels.imports;
 
+import me.xethh.libs.spring.web.security.toolkits.exceptionModels.ControllerAdvice;
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.CustomExceptionHandler;
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.ErrorHandlerController;
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.GeneralExceptionModel;
@@ -7,9 +8,16 @@ import me.xethh.libs.spring.web.security.toolkits.exceptionModels.zuulExceptions
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.context.annotation.Bean;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 public class Config {
+
+    @Bean
+    public ControllerAdvice controllerAdvice(){
+        return new ControllerAdvice();
+    }
+
     @Bean
     public ZuulExceptionHandler zuulExceptionHandler(){
         return new ZuulExceptionHandler();
@@ -19,7 +27,7 @@ public class Config {
     public CustomExceptionHandler defaultCustomExceptionHandler(){
         return new CustomExceptionHandler(){
             @Override
-            public Optional<GeneralExceptionModel> dispatch(Throwable ex) {
+            public Optional<GeneralExceptionModel> dispatch(Throwable ex, HttpServletRequest request) {
                 return Optional.empty();
             }
 
