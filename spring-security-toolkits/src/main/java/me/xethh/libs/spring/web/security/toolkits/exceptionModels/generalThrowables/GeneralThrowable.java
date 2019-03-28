@@ -1,6 +1,6 @@
-package me.xethh.libs.spring.web.security.toolkits.exceptionModels;
+package me.xethh.libs.spring.web.security.toolkits.exceptionModels.generalThrowables;
 
-import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.GeneralExceptionModel;
+import me.xethh.libs.spring.web.security.toolkits.exceptionModels.GeneralExceptionModel;
 
 public class GeneralThrowable extends RuntimeException{
     private GeneralExceptionModel exception;

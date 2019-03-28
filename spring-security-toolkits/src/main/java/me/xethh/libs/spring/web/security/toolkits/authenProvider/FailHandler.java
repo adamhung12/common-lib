@@ -1,14 +1,9 @@
 package me.xethh.libs.spring.web.security.toolkits.authenProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.xethh.libs.spring.web.security.toolkits.exceptionModels.GeneralThrowable;
+import me.xethh.libs.spring.web.security.toolkits.exceptionModels.generalThrowables.GeneralThrowable;
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.StatusBasesGeneralSSTExceptionModelFactory;
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.ExceptionSetter;
-import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.GeneralExceptionModel;
-import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.GeneralExceptionModelImpl;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
@@ -31,7 +26,7 @@ public class FailHandler extends SimpleUrlAuthenticationFailureHandler {
         // response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         // response.getOutputStream().write(bytss);
         // exceptionSetter.setException(response, new GeneralExceptionModelImpl.AuthorizationFail());
-        throw new GeneralThrowable((GeneralExceptionModel) new StatusBasesGeneralSSTExceptionModelFactory.AuthorizationFail());
+        throw new GeneralThrowable(new StatusBasesGeneralSSTExceptionModelFactory.AuthorizationFail());
         // return;
     }
 }

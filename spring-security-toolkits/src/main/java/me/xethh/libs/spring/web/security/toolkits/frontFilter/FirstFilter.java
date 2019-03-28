@@ -301,6 +301,7 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
             logger.debug("Start first filter");
 
         MdcInit();
+        logger.info("Received request from IP: "+servletRequest.getLocalAddr());
         ServletRequest newRequest = servletRequest;
 
         if(newRequest instanceof HttpServletRequest){

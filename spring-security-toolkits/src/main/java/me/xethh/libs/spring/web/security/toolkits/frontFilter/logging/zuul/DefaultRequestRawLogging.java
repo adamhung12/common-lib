@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static me.xethh.libs.spring.web.security.toolkits.frontFilter.TracingSystemConst.TRANSACTION_HEADER;
 
@@ -83,6 +85,8 @@ public class DefaultRequestRawLogging implements RequestRawLogging {
             sb.append("\"").append(NewLine);
         }
     }
+
+    private static Pattern pattern = Pattern.compile("(\\w+ )(.*)");
     public static void getHeaderInfo(StringBuilder sb, HttpServletRequest req) {
         Enumeration<String> headerNames = req.getHeaderNames();
         while (headerNames.hasMoreElements()) {
@@ -91,7 +95,20 @@ public class DefaultRequestRawLogging implements RequestRawLogging {
             Enumeration<String> headers = req.getHeaders(headerName);
             while (headers.hasMoreElements()) {
                 String headerValue = headers.nextElement();
-                sb.append(headerValue);
+                if(headerName.equalsIgnoreCase("Authorization")){
+                    Matcher matcher = pattern.matcher(headerValue);
+                    if(matcher.matches()){
+                        sb.append(matcher.group(1));
+                        sb.append(matcher.group(2).replaceAll("\\w","*"));
+                    }
+                    else{
+                        sb.append(headerValue.replaceAll("\\w","*"));
+                    }
+                }
+                else{
+                    sb.append(headerValue);
+                }
+
                 if (headers.hasMoreElements()) {
                     sb.append(",");
                 }

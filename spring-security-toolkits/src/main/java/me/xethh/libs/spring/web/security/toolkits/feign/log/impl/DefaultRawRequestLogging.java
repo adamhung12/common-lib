@@ -57,10 +57,19 @@ public class DefaultRawRequestLogging implements RawRequestLogging {
         Set<Map.Entry<String, Collection<String>>> headerNames = req.headers().entrySet();
         headerNames.stream().forEach(x->{
             String headerName = x.getKey();
-            sb
-                    .append(headerName).append("=")
-                    .append(x.getValue().stream().collect(Collectors.joining(",","[","]")))
-                    .append(NewLine);
+
+            if(headerName.equalsIgnoreCase("Authorization")){
+                sb
+                        .append(headerName).append("=")
+                        .append(x.getValue().stream().map(y->y.replaceAll("\\w","*")).collect(Collectors.joining(",","[","]")))
+                        .append(NewLine);
+            }
+            else{
+                sb
+                        .append(headerName).append("=")
+                        .append(x.getValue().stream().collect(Collectors.joining(",","[","]")))
+                        .append(NewLine);
+            }
         });
     }
 

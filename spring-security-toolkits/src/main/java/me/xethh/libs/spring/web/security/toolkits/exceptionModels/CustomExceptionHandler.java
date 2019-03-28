@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 public interface CustomExceptionHandler extends WithLogger {
@@ -16,6 +17,6 @@ public interface CustomExceptionHandler extends WithLogger {
         logger().info(String.format("Status is not integer or null[%s]", oStatus));
         return null;
     }
-    Optional<GeneralExceptionModel> dispatch(Throwable ex, HttpServletRequest response);
+    Optional<GeneralExceptionModel> dispatch(Throwable ex, HttpServletRequest request, HttpServletResponse response);
     boolean isSupported(Throwable ex);
 }

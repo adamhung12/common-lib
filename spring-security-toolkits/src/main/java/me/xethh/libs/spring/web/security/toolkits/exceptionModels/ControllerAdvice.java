@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.ExceptionSetter;
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.GeneralExceptionModel;
-import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.GeneralExceptionModelImpl;
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.exceptions.GeneralThrowable;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import org.springframework.beans.ConversionNotSupportedException;
@@ -49,12 +48,14 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler implements 
     // @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public Object handleResourceNotFoundException(Exception ex) {
-        if(ex instanceof GeneralSSTExceptionModel){
+        if(ex instanceof me.xethh.libs.spring.web.security.toolkits.exceptionModels.generalThrowables.GeneralThrowable){
+            logger.error("System throwing general throwable");
+            logger().error(ex.getMessage(),ex);
             return ((GeneralThrowable)ex).getException();
-
         }
-        logger().info(ex.getMessage(),ex);
-        return ex;
+        logger.error("System throwing unknown error");
+        logger().error(ex.getMessage(),ex);
+        return new StatusBasesGeneralSSTExceptionModelFactory.UnknownError(HttpStatus.INTERNAL_SERVER_ERROR,"Unkown error E-9999999999994");
     }
 
     ObjectMapper maper = new ObjectMapper();

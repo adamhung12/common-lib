@@ -127,26 +127,6 @@ public abstract class GeneralExceptionModelImpl implements GeneralExceptionModel
         }
 
     }
-    public static class TokenNotValid extends GeneralExceptionModelImpl {
-        private String message = "Token not valid";
-        public TokenNotValid(){
-            super();
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public HttpStatus getStatus() {
-            return HttpStatus.UNAUTHORIZED;
-        }
-
-    }
     public static class AuthorizationFail extends GeneralExceptionModelImpl {
         private String message = "Authorization failed";
         public AuthorizationFail(){

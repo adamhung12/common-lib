@@ -42,7 +42,7 @@ public class ErrorHandlerController implements ErrorController, WithLogger {
         if(exception!=null && exception instanceof Throwable){
             for(CustomExceptionHandler exceptionHandler : customExceptionHandlerList){
                 if(exceptionHandler.isSupported((Throwable) exception)){
-                    Optional<GeneralExceptionModel> object = exceptionHandler.dispatch((Throwable) exception, request);
+                    Optional<GeneralExceptionModel> object = exceptionHandler.dispatch((Throwable) exception, request, response);
                     if(object.isPresent()){
                         request.removeAttribute("javax.servlet.error.exception");
                         return object.get();
@@ -60,7 +60,7 @@ public class ErrorHandlerController implements ErrorController, WithLogger {
             }
 
             logger.error(((Throwable) exception).getMessage(),exception);
-            return new UnknownError(null, "Unkown error E-9999999999993");
+            return new StatusBasesGeneralSSTExceptionModelFactory.UnknownError(null, "Unkown error E-9999999999993");
         }
 
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
@@ -73,9 +73,9 @@ public class ErrorHandlerController implements ErrorController, WithLogger {
                 if(returnObject!=null)
                     return returnObject;
             }
-            return new UnknownError(null, "Unkown error E-9999999999991");
+            return new StatusBasesGeneralSSTExceptionModelFactory.UnknownError(null, "Unkown error E-9999999999991");
         }
-        return new UnknownError(null, "Unkown error E-9999999999992");
+        return new StatusBasesGeneralSSTExceptionModelFactory.UnknownError(null, "Unkown error E-9999999999992");
     }
 
     public List<CustomExceptionHandler> getCustomExceptionHandlerList() {
@@ -99,20 +99,4 @@ public class ErrorHandlerController implements ErrorController, WithLogger {
         return "/error";
     }
 
-    public static class UnknownError extends GeneralSSTExceptionModel {
-        private String message = "Unknown error";
-        private HttpStatus status;
-
-        protected UnknownError(HttpStatus status, String error) {
-            super(status, error);
-        }
-
-        public String getMessage() {
-            return message;
-        }
-        @Override
-        public HttpStatus getStatus() {
-            return status;
-        }
-    }
 }

@@ -1,6 +1,8 @@
 package me.xethh.libs.spring.web.security.toolkits.preAuthenFilter;
 
 import me.xethh.libs.spring.web.security.toolkits.authenticationModel.ApiTokenAuthenticate;
+import me.xethh.libs.spring.web.security.toolkits.exceptionModels.StatusBasesGeneralSSTExceptionModelFactory;
+import me.xethh.libs.spring.web.security.toolkits.exceptionModels.generalThrowables.GeneralThrowable;
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.GeneralExceptionModelImpl;
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
@@ -42,8 +44,7 @@ public class PreTokenFilter extends OncePerRequestFilter {
 
             Session session = findByIndexNameSessionRepository.findById(token);
             if(session==null){
-                advice.setException(httpServletResponse, new GeneralExceptionModelImpl.TokenNotValid());
-                return;
+                throw new GeneralThrowable(new StatusBasesGeneralSSTExceptionModelFactory.TokenNotValid());
             }
             if(!session.isExpired()){
                 session.setLastAccessedTime(Instant.now());
@@ -60,8 +61,7 @@ public class PreTokenFilter extends OncePerRequestFilter {
                 MDC.put(TRANSACTION_CLIENT_ID, session.getAttribute(TRANSACTION_CLIENT_ID));
             }
             else{
-                advice.setException(httpServletResponse, new GeneralExceptionModelImpl.TokenNotValid());
-                return;
+                throw new GeneralThrowable(new StatusBasesGeneralSSTExceptionModelFactory.AuthorizationFail());
             }
         }
         filterChain.doFilter(httpServletRequest,httpServletResponse);
