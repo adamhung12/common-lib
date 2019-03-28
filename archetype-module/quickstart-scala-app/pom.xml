@@ -6,7 +6,7 @@
     <groupId>me.xethh.archetype.quickstart</groupId>
     <artifactId>quickstart-scala-app</artifactId>
     <!--Migrated from me.xethh.archetype:quickstart:1.1-RELEASE -->
-    <version>1.0-RELEASE</version>
+    <version>1.1-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
