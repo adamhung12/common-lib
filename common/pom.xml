@@ -5,12 +5,12 @@
 	<parent>
 		<artifactId>toolkits</artifactId>
 		<groupId>me.xethh.libs</groupId>
-		<version>1.4.1-RELEASE</version>
+		<version>1.5-RELEASE</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>me.xethh.libs.toolkits</groupId>
-	<version>1.4.2-SNAPSHOT</version>
+	<version>1.4.3-SNAPSHOT</version>
 	<artifactId>common</artifactId>
 
 	<name>common</name>
