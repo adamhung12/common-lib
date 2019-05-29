@@ -1,0 +1,7 @@
+application:
+  name: MessageTransferTool
+  package: me.xethh.libs.mtt.MessageTransferTool
+spring:
+  application:
+    name: ${application.name}
+

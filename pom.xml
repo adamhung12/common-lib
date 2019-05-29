@@ -19,6 +19,7 @@
     <module>spring-security-toolkits</module>
     <module>crawler</module>
     <module>archetype-module</module>
+      <module>MessageTransferTool</module>
   </modules>
   <packaging>pom</packaging>
 
