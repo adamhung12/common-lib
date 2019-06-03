@@ -11,9 +11,10 @@
   </parent>
   <groupId>me.xethh.libs</groupId>
   <artifactId>toolkits</artifactId>
-  <version>1.4.2-RELEASE</version>
+  <version>1.5-RELEASE</version>
   <modules>
-    <module>bom</module>
+<!--    The bom project should be build separately-->
+<!--    <module>bom</module>-->
     <module>common</module>
     <module>spring-security-toolkits</module>
     <module>crawler</module>

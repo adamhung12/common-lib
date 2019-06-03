@@ -3,6 +3,7 @@ package me.xethh.libs.spring.web.security.toolkits.preAuthenFilter;
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.configuration.CustomizedWebSecurityConfigProperties;
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.handler.FailHandler;
 import me.xethh.utils.authUtils.authentication.Encoder;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -76,6 +77,7 @@ public class CustomizedWebSecurityConfig extends WebSecurityConfigurerAdapter{
                     break;
                 case AUTHENTICATED:
                     matcher.authenticated();
+                    break;
                 case IS_IP:
                     throw new RuntimeException("IP filter not support yet");
             }
@@ -93,7 +95,15 @@ public class CustomizedWebSecurityConfig extends WebSecurityConfigurerAdapter{
                     }
                     break;
                 case CLASS:
-                    throw new RuntimeException(String.format("Provider type[%s] not supported", provider.getProviderType()));
+                    if(StringUtils.isNotBlank(provider.getClassName())){
+                        switch (provider.getClassName()){
+                            case "me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.AlwaysTrueAuthenticationProvider":
+                                auth.authenticationProvider(new AlwaysTrueAuthenticationProvider());
+                                break;
+                            default:
+                                throw new RuntimeException(String.format("Provider type[%s] not supported", provider.getProviderType()));
+                        }
+                    }
 
             }
         }
