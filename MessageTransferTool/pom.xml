@@ -25,7 +25,7 @@
 
     <!--Add project information here start-->
     <url></url>
-    <description></description>
+    <description>Transfer message tool</description>
     <developers>
         <developer>
             <name>Xeth Hung</name>
@@ -262,22 +262,22 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>me.xethh.libs.mtt.MessageTransferTool.JavaApp</mainClass>
-                    <layout>ZIP</layout>
-                    <executable>true</executable>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <mainClass>me.xethh.libs.mtt.MessageTransferTool.JavaApp</mainClass>-->
+<!--                    <layout>ZIP</layout>-->
+<!--                    <executable>true</executable>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>repackage</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 </project>
