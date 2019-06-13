@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>me.xethh.libs.mtt</groupId>
-    <artifactId>MessageTransferTool</artifactId>
+    <artifactId>core</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <name>MessageTransferTool</name>
@@ -23,7 +23,7 @@
         </license>
     </licenses>
 
-    <!--Add project information here start-->
+    <!--Push project information here start-->
     <url></url>
     <description>Transfer message tool</description>
     <developers>
@@ -33,9 +33,9 @@
             <organizationUrl>http://blog.xethh.me</organizationUrl>
         </developer>
     </developers>
-    <!--Add project information here end-->
+    <!--Push project information here end-->
 
-    <!--Add SCM and distribution managemetn start-->
+    <!--Push SCM and distribution managemetn start-->
     <scm>
         <connection></connection>
         <developerConnection></developerConnection>
@@ -51,7 +51,7 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-    <!--Add SCM and distribution managemetn end-->
+    <!--Push SCM and distribution managemetn end-->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
