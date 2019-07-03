@@ -7,7 +7,7 @@
 
 	<groupId>me.xethh.libs.toolkits</groupId>
 	<artifactId>libs-bom</artifactId>
-	<version>1.4.5-RELEASE</version>
+	<version>1.4.7-RELEASE</version>
 	<name>libs-bom</name>
 
 	<!-- FIXME change it to the project's website -->
@@ -56,8 +56,8 @@
 			</dependency>
 			<dependency>
 				<groupId>me.xethh.libs.toolkits</groupId>
-				<artifactId>common</artifactId>
-				<version>1.4.2-RELEASE</version>
+				<artifactId>commons</artifactId>
+				<version>1.5-RELEASE</version>
 			</dependency>
 			<dependency>
 				<groupId>me.xethh.utils</groupId>
