@@ -11,7 +11,7 @@
 
 	<groupId>me.xethh.libs.toolkits</groupId>
 	<version>1.5-SNAPSHOT</version>
-	<artifactId>common</artifactId>
+	<artifactId>commons</artifactId>
 
 	<name>common</name>
 	<!-- FIXME change it to the project's website -->
