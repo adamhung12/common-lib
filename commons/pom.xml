@@ -10,8 +10,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>me.xethh.libs.toolkits</groupId>
-	<version>1.4.3-SNAPSHOT</version>
-	<artifactId>common</artifactId>
+	<version>1.5-SNAPSHOT</version>
+	<artifactId>commons</artifactId>
 
 	<name>common</name>
 	<!-- FIXME change it to the project's website -->
@@ -37,8 +37,8 @@
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
 	<distributionManagement>
 		<snapshotRepository>
