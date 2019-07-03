@@ -15,7 +15,7 @@
   <modules>
 <!--    The bom project should be build separately-->
 <!--    <module>bom</module>-->
-    <module>common</module>
+    <module>commons</module>
     <module>spring-security-toolkits</module>
     <module>crawler</module>
     <module>archetype-module</module>
