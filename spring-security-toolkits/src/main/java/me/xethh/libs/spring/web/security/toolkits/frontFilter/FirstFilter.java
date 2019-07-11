@@ -349,4 +349,9 @@ public class FirstFilter extends GenericFilterBean implements WithLogger {
 
         filterChain.doFilter(newRequest,newResponse);
     }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
+    }
 }

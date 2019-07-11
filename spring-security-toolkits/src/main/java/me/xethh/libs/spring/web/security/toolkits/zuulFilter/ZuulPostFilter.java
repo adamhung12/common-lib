@@ -8,6 +8,8 @@ import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul.Respo
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul.ResponseRawLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -67,5 +69,10 @@ public class ZuulPostFilter extends ZuulFilter implements WithLogger {
             ctx.setResponse(response);
         }
         return null;
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

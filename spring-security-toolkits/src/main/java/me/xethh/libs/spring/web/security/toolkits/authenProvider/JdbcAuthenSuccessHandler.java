@@ -2,6 +2,8 @@ package me.xethh.libs.spring.web.security.toolkits.authenProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.xethh.libs.toolkits.logging.WithLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -51,6 +53,11 @@ public class JdbcAuthenSuccessHandler extends SimpleUrlAuthenticationSuccessHand
             clearAuthenticationAttributes(request);
         }
         return;
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 
     public static class TokenResponse {

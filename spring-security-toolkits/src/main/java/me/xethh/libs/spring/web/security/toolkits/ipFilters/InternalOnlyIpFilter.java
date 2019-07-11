@@ -3,6 +3,8 @@ package me.xethh.libs.spring.web.security.toolkits.ipFilters;
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.StatusBasesGeneralSSTExceptionModelFactory;
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.generalThrowables.GeneralThrowable;
 import me.xethh.libs.toolkits.logging.WithLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.Ordered;
@@ -54,5 +56,10 @@ public class InternalOnlyIpFilter extends GenericFilterBean implements WithLogge
         }
         else
             chain.doFilter(request,response);
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

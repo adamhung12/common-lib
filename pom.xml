@@ -12,14 +12,14 @@
   <groupId>me.xethh.libs</groupId>
   <artifactId>toolkits</artifactId>
   <version>1.5-RELEASE</version>
-  <modules>
+<!--  <modules>-->
 <!--    The bom project should be build separately-->
 <!--    <module>bom</module>-->
-    <module>commons</module>
-    <module>spring-security-toolkits</module>
-    <module>crawler</module>
-    <module>archetype-module</module>
-  </modules>
+<!--    <module>commons</module>-->
+<!--    <module>spring-security-toolkits</module>-->
+<!--    <module>crawler</module>-->
+<!--    <module>archetype-module</module>-->
+<!--  </modules>-->
   <packaging>pom</packaging>
 
   <name>toolkits</name>

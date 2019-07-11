@@ -6,6 +6,8 @@ import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.ExceptionSette
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.GeneralExceptionModel;
 import me.xethh.libs.spring.web.security.toolkits.preAuthenFilter.exceptionModel.exceptions.GeneralThrowable;
 import me.xethh.libs.toolkits.logging.WithLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
@@ -77,6 +79,11 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler implements 
             e.printStackTrace();
         }
         // httpServletResponse.setContentLength(response.length());
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 
     public interface CpaasExceptionModel {

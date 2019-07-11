@@ -4,6 +4,8 @@ import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.common.Res
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.common.ResponseRawLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
@@ -16,6 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CachingResponseWrapper<AccessLogging extends ResponseAccessLogging, RawLogging extends ResponseRawLogging> extends HttpServletResponseWrapper implements WithLogger {
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
+    }
+
     public interface LogOperation{
         void log(CachingResponseWrapper responseWrapper);
     }

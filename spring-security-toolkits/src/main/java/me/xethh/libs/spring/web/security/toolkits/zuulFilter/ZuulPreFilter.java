@@ -9,6 +9,8 @@ import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul.Reque
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.logging.zuul.RequestRawLogging;
 import me.xethh.libs.toolkits.logging.WithLogger;
 import me.xethh.utils.dateManipulation.DateFormatBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,5 +99,10 @@ public class ZuulPreFilter extends ZuulFilter implements WithLogger {
             req.setAttribute("Authorization", Base64.getEncoder().encodeToString("CITIC_CPAAS_API:SAAPC_CITIC_@#21".getBytes()));
         }
         return null;
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

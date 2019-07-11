@@ -139,5 +139,10 @@ public class FeignLogger extends Logger implements WithLogger {
             }
         }
     }
+
+    @Override
+    public org.slf4j.Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
+    }
 }
 

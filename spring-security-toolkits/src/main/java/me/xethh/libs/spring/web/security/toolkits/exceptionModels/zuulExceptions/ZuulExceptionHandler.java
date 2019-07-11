@@ -5,6 +5,8 @@ import me.xethh.libs.spring.web.security.toolkits.exceptionModels.CustomExceptio
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.GeneralExceptionModel;
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.GeneralSSTExceptionModel;
 import me.xethh.libs.toolkits.logging.WithLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,11 @@ public class ZuulExceptionHandler implements CustomExceptionHandler, WithLogger 
         if(ex instanceof ZuulException)
             return true;
         return false;
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 
     public static class ZuulError extends GeneralSSTExceptionModel {

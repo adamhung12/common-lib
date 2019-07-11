@@ -1,6 +1,7 @@
 package me.xethh.libs.spring.web.security.toolkits.authenProvider;
 
 import me.xethh.libs.toolkits.logging.WithLogger;
+import me.xethh.libs.toolkits.logging.WithLoggerImpl;
 import me.xethh.utils.authUtils.authentication.impl.common.PureAuthUser;
 import me.xethh.utils.authUtils.spring.SpringAuthenticator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import java.util.*;
 
 import static org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME;
 
-public class JdbcAuthenProvider
+public class JdbcAuthenProvider extends WithLoggerImpl
         implements AuthenticationProvider, WithLogger {
     public static class JdbcAuthority implements GrantedAuthority {
         public static JdbcAuthority of(String authority){

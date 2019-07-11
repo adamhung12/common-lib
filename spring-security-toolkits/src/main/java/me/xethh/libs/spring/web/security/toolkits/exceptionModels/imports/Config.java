@@ -6,6 +6,8 @@ import me.xethh.libs.spring.web.security.toolkits.exceptionModels.ErrorHandlerCo
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.GeneralExceptionModel;
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.generalThrowables.GeneralThrowableHandler;
 import me.xethh.libs.spring.web.security.toolkits.exceptionModels.zuulExceptions.ZuulExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.context.annotation.Bean;
 
@@ -28,6 +30,12 @@ public class Config {
     @Bean
     public CustomExceptionHandler defaultCustomExceptionHandler(){
         return new CustomExceptionHandler(){
+
+            @Override
+            public Logger logger() {
+                return LoggerFactory.getLogger(this.getClass());
+            }
+
             @Override
             public Optional<GeneralExceptionModel> dispatch(Throwable ex, HttpServletRequest request, HttpServletResponse response) {
                 return Optional.empty();
