@@ -44,7 +44,7 @@ public class TestPathDetectorImpl {
     @Test
     public void testWindowsNetworkPattern(){
         assertFalse(PathDetector.PathDetectorImpl.WINDOWS_NETWORK_PATH_PATTERN.matcher("a:\\\\").matches());
-        assertFalse(PathDetector.PathDetectorImpl.WINDOWS_NETWORK_PATH_PATTERN.matcher("\\\\xxx").matches());
+        assertTrue(PathDetector.PathDetectorImpl.WINDOWS_NETWORK_PATH_PATTERN.matcher("\\\\xxx").matches());
         assertTrue(PathDetector.PathDetectorImpl.WINDOWS_NETWORK_PATH_PATTERN.matcher("\\\\xxx\\").matches());
         assertTrue(PathDetector.PathDetectorImpl.WINDOWS_NETWORK_PATH_PATTERN.matcher("\\\\xxx\\\\").matches());
         assertTrue(PathDetector.PathDetectorImpl.WINDOWS_NETWORK_PATH_PATTERN.matcher("\\\\xxx\\xxxx\\").matches());
@@ -58,7 +58,7 @@ public class TestPathDetectorImpl {
     @Test
     public void testLinuxNetworkPattern(){
         assertFalse(PathDetector.PathDetectorImpl.LINUX_NETWORK_PATH_PATTERN.matcher("//").matches());
-        assertFalse(PathDetector.PathDetectorImpl.LINUX_NETWORK_PATH_PATTERN.matcher("//xxx").matches());
+        assertTrue(PathDetector.PathDetectorImpl.LINUX_NETWORK_PATH_PATTERN.matcher("//xxx").matches());
         assertTrue(PathDetector.PathDetectorImpl.LINUX_NETWORK_PATH_PATTERN.matcher("//xxx/ss").matches());
     }
 
