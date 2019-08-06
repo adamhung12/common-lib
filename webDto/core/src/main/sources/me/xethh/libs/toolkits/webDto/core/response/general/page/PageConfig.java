@@ -22,20 +22,20 @@ public class PageConfig {
         return new PageConfig();
     }
 
-    public PageConfig page(int page){
+    public PageConfig page(long page){
         this.page = page;
         return this;
     }
 
-    public PageConfig pageSize(int pageSize){
+    public PageConfig pageSize(long pageSize){
         this.pageSize = pageSize;
         return this;
     }
 
     public PageConfigValidation valid(){
-        if(page<0)
+        if(page<=0)
             return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d] is not valid", pageSize, page));
-        else if(pageSize<0)
+        else if(pageSize<=0)
             return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d] is not valid", pageSize, page));
         return new PageConfigValidation(true, "");
     }
@@ -43,12 +43,13 @@ public class PageConfig {
     public PageConfigValidation valid(long itemCount){
         if(!valid().isValid)
             return valid();
-        else if(itemCount<0)
+        else if(itemCount<=0)
             return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid", pageSize, page, itemCount));
-        else if(pageSize>Long.MAX_VALUE/page)
+        else if(pageSize>Long.MAX_VALUE/(page-1))
             return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid, page * pageSize > Long.MAX_VALUE", pageSize, page, itemCount));
-        else if(page*pageSize>itemCount)
-
+        else if((page-1)*pageSize>itemCount)
+            return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid, page * pageSize > Long.MAX_VALUE", pageSize, page, itemCount));
+        return new PageConfigValidation(true, "");
     }
 
     @Getter

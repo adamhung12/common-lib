@@ -19,7 +19,7 @@ public class PageConfigTest {
         assertEquals(0, pc.getPage());
         assertEquals(0, pc.getPageSize());
 
-        pc = PageConfig.get().page(2).pageSize(222)
+        pc = PageConfig.get().page(2).pageSize(222);
         assertEquals(2, pc.getPage());
         assertEquals(222, pc.getPageSize());
 
