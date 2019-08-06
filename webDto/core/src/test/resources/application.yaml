@@ -1,0 +1,7 @@
+application:
+  name: core
+  package: me.xethh.libs.toolkits.webDto.core
+spring:
+  application:
+    name: ${application.name}
+
