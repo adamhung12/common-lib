@@ -20,10 +20,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.16.16</version>
-                <scope>provided</scope>
+                <groupId>me.xethh.libs.toolkits</groupId>
+                <artifactId>commons</artifactId>
+                <version>1.7-RELEASE</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

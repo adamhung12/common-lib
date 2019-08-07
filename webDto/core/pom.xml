@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>toolkits</artifactId>
-    <groupId>me.xethh.libs</groupId>
-    <version>1.4.1-RELEASE</version>
+    <artifactId>webDto</artifactId>
+    <groupId>me.xethh.libs.toolkits</groupId>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
   <groupId>me.xethh.libs.toolkits.webDto</groupId>
@@ -89,15 +89,18 @@
       <groupId>me.xethh.utils</groupId>
       <artifactId>DateUtils</artifactId>
     </dependency>
-    <!-- Spring boot dependencies start-->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
+      <groupId>me.xethh.libs.toolkits</groupId>
+      <artifactId>commons</artifactId>
     </dependency>
   </dependencies>
   <dependencyManagement>

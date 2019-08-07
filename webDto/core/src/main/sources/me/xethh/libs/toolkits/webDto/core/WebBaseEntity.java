@@ -1,14 +1,27 @@
 package me.xethh.libs.toolkits.webDto.core;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 
-@Setter
-@Getter
 public class WebBaseEntity {
     private String id;
-    private Date start;
-    private Date end;
+    @JsonIgnore
+    private MetaEntity meta;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public MetaEntity getMeta() {
+        return meta;
+    }
+
+    public void setMeta(MetaEntity meta) {
+        this.meta = meta;
+    }
 }
