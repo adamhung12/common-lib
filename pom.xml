@@ -11,7 +11,7 @@
   </parent>
   <groupId>me.xethh.libs</groupId>
   <artifactId>toolkits</artifactId>
-  <version>1.5-RELEASE</version>
+  <version>1.5.1-SNAPSHOT</version>
 <!--  <modules>-->
 <!--    The bom project should be build separately-->
 <!--    <module>bom</module>-->
@@ -101,11 +101,6 @@
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
         <version>2.9.7</version>
-      </dependency>
-      <dependency>
-        <groupId>me.xethh.utils</groupId>
-        <artifactId>DateUtils</artifactId>
-        <version>6.0.0.RC1-RELEASE</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
