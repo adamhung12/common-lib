@@ -1,6 +1,6 @@
 package me.xethh.libs.toolkits.webDto.core;
 
-import me.xethh.libs.toolkits.webDto.core.response.general.page.PageConfig;
+import me.xethh.libs.toolkits.webDto.core.general.page.PageConfig;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

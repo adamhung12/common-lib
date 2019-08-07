@@ -1,4 +1,4 @@
-package me.xethh.libs.toolkits.webDto.core.response.general.page;
+package me.xethh.libs.toolkits.webDto.core.general.page;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -9,6 +9,15 @@ import java.util.List;
  * date 5/7/2018
  */
 public class PagedObject<Data> {
+    private PagedObject(long page, long pageSize, List<Data> data, long itemCount){
+        PageConfig config = new PageConfig(page, pageSize);
+        this.page=config.getPage();
+        this.pageSize=config.getPageSize();
+        this.startFrom=config.from();
+        this.endTo = config.to(itemCount);
+        this.total=itemCount;
+        this.data = data;
+    }
     private PagedObject(long page, long pageSize, List<Data> data){
         PageConfig config = new PageConfig(page, pageSize);
         this.page=config.getPage();
@@ -17,6 +26,12 @@ public class PagedObject<Data> {
         this.endTo = config.to(data.size());
         this.total=data.size();
         this.data = data.subList((int)startFrom,(int)endTo);
+    }
+    public static <Data> PagedObject get(long page, long pageSize, List<Data> data, long itemCount){
+        return new PagedObject(page, pageSize, data, itemCount);
+    }
+    public static <Data> PagedObject get(PageConfig config, List<Data> data){
+        return new PagedObject(config.getPage(), config.getPageSize(), data);
     }
     public static <Data> PagedObject get(long page, long pageSize, List<Data> data){
         return new PagedObject(page, pageSize, data);

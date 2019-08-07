@@ -1,4 +1,4 @@
-package me.xethh.libs.toolkits.webDto.core.response.general.page;
+package me.xethh.libs.toolkits.webDto.core.general.page;
 
 import me.xethh.libs.toolkits.exceptions.CommonException;
 
