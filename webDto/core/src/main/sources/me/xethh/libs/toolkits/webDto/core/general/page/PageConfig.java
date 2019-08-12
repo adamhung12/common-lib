@@ -65,10 +65,10 @@ public class PageConfig {
             return valid();
         else if(itemCount<=0)
             return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid", pageSize, page, itemCount));
-        else if(pageSize>Long.MAX_VALUE/(page-1))
+        else if(page>(Long.MAX_VALUE/pageSize))
             return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid, page * pageSize > Long.MAX_VALUE", pageSize, page, itemCount));
-        else if(((page-1)*pageSize+1)>=itemCount)
-            return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid, page * pageSize > Long.MAX_VALUE", pageSize, page, itemCount));
+        else if(((page-1)*pageSize+1)>itemCount)
+            return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid, page not exists due to item count less than expected", pageSize, page, itemCount));
         return new PageConfigValidation(true, "");
     }
 

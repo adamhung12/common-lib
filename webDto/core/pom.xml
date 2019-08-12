@@ -5,14 +5,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>webDto</artifactId>
     <groupId>me.xethh.libs.toolkits</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>webDto</artifactId>
+    <version>1.0.0</version>
   </parent>
 
   <groupId>me.xethh.libs.toolkits.webDto</groupId>
   <artifactId>core</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>0.9.0-BETA</version>
 
   <name>core</name>
 
