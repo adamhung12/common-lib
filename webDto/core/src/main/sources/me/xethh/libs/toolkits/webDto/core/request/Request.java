@@ -12,4 +12,11 @@ public abstract class Request<Data> extends WebBaseEntity {
     public void setData(Data data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        return "Request{" +
+                "data=" + data +
+                '}';
+    }
 }

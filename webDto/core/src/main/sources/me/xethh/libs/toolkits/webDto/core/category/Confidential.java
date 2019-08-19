@@ -16,4 +16,5 @@ public interface Confidential {
         }
         public abstract String confidentialToString();
     }
+
 }
