@@ -14,6 +14,6 @@ class FirstLayerFilter() : GenericFilterBean(), WithLogger {
     internal var properties: FirstFilterProperties? = null
 
     override fun doFilter(request: ServletRequest?, response: ServletResponse?, filterchain: FilterChain?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        filterchain?.doFilter(request, response)
     }
 }

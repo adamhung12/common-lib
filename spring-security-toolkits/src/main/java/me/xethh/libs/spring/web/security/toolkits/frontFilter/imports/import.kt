@@ -18,6 +18,7 @@ annotation class EnableFirstLayerFilter
 
 class EnableFirstLayerFilterConfig{
     @Autowired lateinit var firstLayerFilterProperties:FirstLayerFilterProperties
+
     @Bean
     fun appNameProvider(): AppNameProvider {
         when (firstLayerFilterProperties.appNameConfig.type!!) {
@@ -27,7 +28,7 @@ class EnableFirstLayerFilterConfig{
         }
     }
 
-    @Autowired
+    @Bean
     fun firstLayerFilter() : FirstLayerFilter{
         return FirstLayerFilter()
     }
