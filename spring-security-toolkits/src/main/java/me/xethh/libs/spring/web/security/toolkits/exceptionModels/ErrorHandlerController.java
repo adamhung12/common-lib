@@ -2,7 +2,6 @@ package me.xethh.libs.spring.web.security.toolkits.exceptionModels;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.xethh.libs.toolkits.logging.WithLogger;
-import me.xethh.libs.toolkits.logging.WithLoggerImpl;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
@@ -21,7 +20,7 @@ import java.util.Optional;
 
 
 @Controller
-public class ErrorHandlerController extends WithLoggerImpl implements ErrorController, WithLogger {
+public class ErrorHandlerController implements ErrorController, WithLogger {
     @PostConstruct
     public void init(){
         logger.info("Initialized ErrorHandlerController.");

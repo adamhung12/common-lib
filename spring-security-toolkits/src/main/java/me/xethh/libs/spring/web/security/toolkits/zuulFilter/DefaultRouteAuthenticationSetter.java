@@ -3,12 +3,11 @@ package me.xethh.libs.spring.web.security.toolkits.zuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import me.xethh.libs.spring.web.security.toolkits.frontFilter.configurationProperties.FirstFilterProperties;
 import me.xethh.libs.toolkits.logging.WithLogger;
-import me.xethh.libs.toolkits.logging.WithLoggerImpl;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Base64;
 
-public class DefaultRouteAuthenticationSetter extends WithLoggerImpl implements RouteAuthenticationSetter, WithLogger {
+public class DefaultRouteAuthenticationSetter implements RouteAuthenticationSetter, WithLogger {
     @Value("${first-filter.zuul.with-authen.authen-type:None}")
     private FirstFilterProperties.AuthenType authenType;
     @Value("${first-filter.zuul.with-authen.value:}")

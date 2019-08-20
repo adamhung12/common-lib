@@ -111,11 +111,16 @@ public class FirstFilterProperties {
 
     }
     public static class AppNameConfig{
-       public enum BuildType{
+        public static AppNameConfig getDefault(){
+            AppNameConfig conf = new AppNameConfig();
+            conf.type = BuildType.Default;
+            return conf;
+        }
+        public enum BuildType{
            Default, None, Custom
-       }
+        }
 
-       private BuildType type;
+        private BuildType type;
 
         public BuildType getType() {
             return type;

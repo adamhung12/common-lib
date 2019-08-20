@@ -25,8 +25,9 @@ public class ApiTokenAuthenticate extends UsernamePasswordAuthenticationToken {
     /**
      * Creates a token with the supplied array of authorities.
      *
-     * @param authorities the collection of <tt>GrantedAuthority</tt>s for the principal
-     * represented by this authentication object.
+     * @param username username
+     * @param token token
+     * @param authorities the collection of GrantedAuthority for the principal
      */
     public ApiTokenAuthenticate(String username, String token, Collection<? extends GrantedAuthority> authorities) {
         super(username,token,authorities);

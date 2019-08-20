@@ -1,7 +1,6 @@
 package me.xethh.libs.spring.web.security.toolkits.authenProvider;
 
 import me.xethh.libs.toolkits.logging.WithLogger;
-import me.xethh.libs.toolkits.logging.WithLoggerImpl;
 import me.xethh.utils.authUtils.authentication.impl.common.PureAuthUser;
 import me.xethh.utils.authUtils.spring.SpringAuthenticator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ import java.util.*;
 
 import static org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME;
 
-public class JdbcAuthenProvider extends WithLoggerImpl
+public class JdbcAuthenProvider
         implements AuthenticationProvider, WithLogger {
     public static class JdbcAuthority implements GrantedAuthority {
         public static JdbcAuthority of(String authority){
@@ -37,11 +36,13 @@ public class JdbcAuthenProvider extends WithLoggerImpl
     public static class JdbcAuthentication extends AbstractAuthenticationToken {
 
         private String username, password;
+
         /**
          * Creates a token with the supplied array of authorities.
          *
-         * @param authorities the collection of <tt>GrantedAuthority</tt>s for the principal
-         * represented by this authentication object.
+         * @param username username
+         * @param password credential
+         * @param authorities the collection of GrantedAuthority for the principal
          */
         public JdbcAuthentication(String username, String password, Collection<? extends GrantedAuthority> authorities) {
             super(authorities);
