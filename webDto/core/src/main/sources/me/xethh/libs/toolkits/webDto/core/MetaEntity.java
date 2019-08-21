@@ -3,6 +3,10 @@ package me.xethh.libs.toolkits.webDto.core;
 import java.util.Date;
 
 public class MetaEntity {
+    public static class HEADER{
+        public static String REQUEST_ID_HEADER="Y-REQUEST-ID";
+        public static String PROXY_STRING_HEADER="Y-PROXY-STRING";
+    }
     public enum RequestType{GET,POST,PUT,DELETE,PATCH}
     private String version="v1";
     private RequestType requestType;
