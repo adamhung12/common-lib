@@ -25,7 +25,7 @@ public class PagedObject<Data> {
         this.startFrom=config.from();
         this.endTo = config.to(data.size());
         this.total=data.size();
-        this.data = data.subList((int)startFrom,(int)endTo);
+        this.data = data.subList((int)startFrom-1,(int)endTo);
     }
     public static <Data> PagedObject get(long page, long pageSize, List<Data> data, long itemCount){
         return new PagedObject(page, pageSize, data, itemCount);
