@@ -1,15 +1,23 @@
 package me.xethh.libs.toolkits.webDto.core.response.err;
 
 public class ResponseError {
-    private String errCode;
+    private String code;
     private String message;
 
-    public String getErrCode() {
-        return errCode;
+    public ResponseError() {
     }
 
-    public void setErrCode(String errCode) {
-        this.errCode = errCode;
+    public ResponseError(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getMessage() {
