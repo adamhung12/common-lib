@@ -9,69 +9,63 @@ import java.util.List;
  * date 5/7/2018
  */
 public class PagedObject<Data> {
-    private PagedObject(long page, long pageSize, List<Data> data, long itemCount){
-        PageConfig config = new PageConfig(page, pageSize);
-        this.page=config.getPage();
-        this.pageSize=config.getPageSize();
+    private PagedObject(int page, int pageSize, List<Data> data, int total){
+        this.page=page;
+        this.pageSize=pageSize;
+        PageConfig config = config();
         this.startFrom=config.from();
-        this.endTo = config.to(itemCount);
-        this.total=itemCount;
-        this.data = data;
+        this.endTo = config.to(total);
+        this.total=total;
+        if(data.size()>pageSize)
+            this.data  = data.subList(0, pageSize);
+        else
+            this.data = data;
     }
-    private PagedObject(long page, long pageSize, List<Data> data){
-        PageConfig config = new PageConfig(page, pageSize);
-        this.page=config.getPage();
-        this.pageSize=config.getPageSize();
-        this.startFrom=config.from();
-        this.endTo = config.to(data.size());
-        this.total=data.size();
-        this.data = data.subList((int)startFrom-1,(int)endTo);
+    public PageConfig config(){
+        return new PageConfig(page, pageSize);
     }
-    public static <Data> PagedObject get(long page, long pageSize, List<Data> data, long itemCount){
-        return new PagedObject(page, pageSize, data, itemCount);
+    public static <Data> PagedObject<Data> get(PageConfig pageConfig, List<Data> data){
+        return get(pageConfig, pageConfig.paging(data), data.size());
     }
-    public static <Data> PagedObject get(PageConfig config, List<Data> data){
-        return new PagedObject(config.getPage(), config.getPageSize(), data);
+    public static <Data> PagedObject<Data> get(PageConfig config, List<Data> data, int total){
+        return new PagedObject(config.getPage(), config.getPageSize(), data, total);
     }
-    public static <Data> PagedObject get(long page, long pageSize, List<Data> data){
-        return new PagedObject(page, pageSize, data);
-    }
-    private long pageSize;
-    private long page;
-    private long startFrom=-1;
-    private long endTo=-1;
-    private long total=-1;
+    private int pageSize;
+    private int page;
+    private int startFrom=-1;
+    private int endTo=-1;
+    private int total=-1;
     private Collection<Data> data = new LinkedList<>();
 
-    public long getPageSize() {
+    public int getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(long pageSize) {
+    public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 
-    public long getPage() {
+    public int getPage() {
         return page;
     }
 
-    public void setPage(long page) {
+    public void setPage(int page) {
         this.page = page;
     }
 
-    public long getStartFrom() {
+    public int getStartFrom() {
         return startFrom;
     }
 
-    public void setStartFrom(long startFrom) {
+    public void setStartFrom(int startFrom) {
         this.startFrom = startFrom;
     }
 
-    public long getEndTo() {
+    public int getEndTo() {
         return endTo;
     }
 
-    public void setEndTo(long endTo) {
+    public void setEndTo(int endTo) {
         this.endTo = endTo;
     }
 
@@ -83,11 +77,11 @@ public class PagedObject<Data> {
         this.data = data;
     }
 
-    public long getTotal() {
+    public int getTotal() {
         return total;
     }
 
-    public void setTotal(long total) {
+    public void setTotal(int total) {
         this.total = total;
     }
 }

@@ -1,7 +1,11 @@
 package me.xethh.libs.toolkits.webDto.core;
 
 import me.xethh.libs.toolkits.webDto.core.general.page.PageConfig;
+import me.xethh.libs.toolkits.webDto.core.general.page.PagedObject;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -72,5 +76,21 @@ public class PageConfigTest {
 
         valid = PageConfig.get().page(2).pageSize(200).valid(401);
         assertTrue(valid.isValid());
+    }
+
+    @Test
+    public void testSplit(){
+        PageConfig pageConfig = PageConfig.get(2, 3);
+        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
+        List<Integer> subList = pageConfig.paging(list);
+        assertEquals((Integer)4,subList.get(0));
+        assertEquals((Integer)5,subList.get(1));
+        assertEquals((Integer)6,subList.get(2));
+
+        PagedObject pagedObject = PagedObject.get(pageConfig,subList,list.size());
+        assertEquals(4,pagedObject.getStartFrom());
+        assertEquals(6, pagedObject.getEndTo());
+        assertEquals(8, pagedObject.getTotal());
+        assertEquals(subList,pagedObject.getData());
     }
 }

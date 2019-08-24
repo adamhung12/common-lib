@@ -2,6 +2,9 @@ package me.xethh.libs.toolkits.webDto.core.general.page;
 
 import me.xethh.libs.toolkits.exceptions.CommonException;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * @author xethhung
  * date 5/7/2018
@@ -16,23 +19,23 @@ public class PageConfig {
     public PageConfig() {
     }
 
-    public PageConfig(long page, long pageSize) {
+    public PageConfig(int page, int pageSize) {
         this.page = page;
         this.pageSize = pageSize;
     }
 
-    private long page = 0;
-    private long pageSize = 0;
+    private int page = 0;
+    private int pageSize = 0;
 
-    public long from(){
+    public int from(){
         if(!valid().isValid()) throw new PageConfigException("Page config not correct, "+valid().message);
         return (page-1)*pageSize+1;
     }
-    public long to(){
+    public int to(){
         if(!valid().isValid()) throw new PageConfigException("Page config not correct, "+valid().message);
         return page*pageSize;
     }
-    public long to(long itemCount){
+    public int to(int itemCount){
         if(!valid(itemCount).isValid()) throw new PageConfigException("Page config not correct, "+valid(itemCount).message);
         return Math.min(to(), itemCount);
     }
@@ -40,13 +43,16 @@ public class PageConfig {
     public static PageConfig get(){
         return new PageConfig();
     }
+    public static PageConfig get(int page, int pageSize){
+        return new PageConfig(page, pageSize);
+    }
 
-    public PageConfig page(long page){
+    public PageConfig page(int page){
         this.page = page;
         return this;
     }
 
-    public PageConfig pageSize(long pageSize){
+    public PageConfig pageSize(int pageSize){
         this.pageSize = pageSize;
         return this;
     }
@@ -60,31 +66,31 @@ public class PageConfig {
         return new PageConfigValidation(true, "");
     }
 
-    public PageConfigValidation valid(long itemCount){
+    public PageConfigValidation valid(int itemCount){
         if(!valid().isValid())
             return valid();
         else if(itemCount<=0)
             return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid", pageSize, page, itemCount));
-        else if(page>(Long.MAX_VALUE/pageSize))
+        else if(page>(Integer.MAX_VALUE/pageSize))
             return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid, page * pageSize > Long.MAX_VALUE", pageSize, page, itemCount));
         else if(((page-1)*pageSize+1)>itemCount)
             return new PageConfigValidation(false, String.format("Page[page size=%d, page=%d, item count=%d] is not valid, page not exists due to item count less than expected", pageSize, page, itemCount));
         return new PageConfigValidation(true, "");
     }
 
-    public long getPage() {
+    public int getPage() {
         return page;
     }
 
-    public void setPage(long page) {
+    public void setPage(int page) {
         this.page = page;
     }
 
-    public long getPageSize() {
+    public int getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(long pageSize) {
+    public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 
@@ -117,4 +123,7 @@ public class PageConfig {
         }
     }
 
+    public <Data> List<Data> paging(List<Data> data){
+        return data.subList((int)from()-1, (int)to());
+    }
 }
