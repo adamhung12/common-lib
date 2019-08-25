@@ -124,6 +124,6 @@ public class PageConfig {
     }
 
     public <Data> List<Data> paging(List<Data> data){
-        return data.subList((int)from()-1, (int)to());
+        return data.subList((int)from()-1, (int)to(data.size()));
     }
 }

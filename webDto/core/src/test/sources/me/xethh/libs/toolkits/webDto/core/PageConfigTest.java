@@ -92,5 +92,11 @@ public class PageConfigTest {
         assertEquals(6, pagedObject.getEndTo());
         assertEquals(8, pagedObject.getTotal());
         assertEquals(subList,pagedObject.getData());
+
+        pageConfig = PageConfig.get(1,10);
+        list = Arrays.asList(10);
+        List<Integer> data = pageConfig.paging(list);
+        assertEquals(1, data.size());
+        assertEquals((Integer)10,data.get(0));
     }
 }
