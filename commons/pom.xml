@@ -10,7 +10,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>me.xethh.libs.toolkits</groupId>
-	<version>1.8-RELEASE</version>
+	<version>1.9-RELEASE</version>
 	<artifactId>commons</artifactId>
 
 	<name>common</name>
@@ -68,6 +68,11 @@
 		<dependency>
 			<groupId>me.xethh.utils</groupId>
 			<artifactId>DateUtils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.8.9</version>
 		</dependency>
 	</dependencies>
 
