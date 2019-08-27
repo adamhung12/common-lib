@@ -1,8 +1,8 @@
 package me.xethh.libs.toolkits.webDto.core.request.search;
 
-import me.xethh.libs.toolkits.webDto.core.WebBaseEntity;
+import me.xethh.libs.toolkits.webDto.core.request.Request;
 
-public class SearchingRequest<Search extends SearchingCriteria> extends WebBaseEntity {
+public class SearchingRequest<Search extends SearchingCriteria> extends Request {
 
     private Search search;
 
