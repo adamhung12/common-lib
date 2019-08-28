@@ -63,7 +63,7 @@ public class PageConfigTest {
         assertFalse(valid.isValid());
 
         valid = PageConfig.get().page(1).pageSize(200).valid(0);
-        assertFalse(valid.isValid());
+        assertTrue(valid.isValid());
 
         valid = PageConfig.get().page(2).pageSize(200).valid(199);
         assertFalse(valid.isValid());
