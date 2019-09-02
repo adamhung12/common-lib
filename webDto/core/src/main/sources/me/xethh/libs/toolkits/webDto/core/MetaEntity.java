@@ -6,6 +6,7 @@ public class MetaEntity {
     public static class HEADER{
         public static String REQUEST_ID_HEADER="Y-REQUEST-ID";
         public static String PROXY_STRING_HEADER="Y-PROXY-STRING";
+        public static String SESSION_ID_HEADER="Y-SESSION-ID";
     }
     public enum RequestType{GET,POST,PUT,DELETE,PATCH}
     private String version="v1";
