@@ -25,6 +25,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>me.xethh.libs.toolkits.akka</groupId>
+			<artifactId>commons</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		<dependency>
 			<groupId>me.xethh.utils</groupId>
 			<artifactId>DateUtils</artifactId>
 		</dependency>

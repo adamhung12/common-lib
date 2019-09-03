@@ -12,7 +12,7 @@
 
   <groupId>me.xethh.libs.toolkits.akka</groupId>
   <artifactId>commons</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.1</version>
 
   <name>commons</name>
 
@@ -61,6 +61,15 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>me.xethh.libs.toolkits</groupId>
+      <artifactId>commons</artifactId>
+      <version>2.0.0</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
