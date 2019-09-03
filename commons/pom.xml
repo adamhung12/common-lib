@@ -13,7 +13,7 @@
 	<version>2.0.0</version>
 	<artifactId>commons</artifactId>
 
-	<name>common</name>
+	<name>commons</name>
 	<!-- FIXME change it to the project's website -->
 	<url>http://www.example.com</url>
 	<description>Library of common used tools - major focus on common tools</description>
